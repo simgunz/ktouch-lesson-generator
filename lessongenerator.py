@@ -213,17 +213,20 @@ def formatLesson(currentLetters, lessonText):
     return out
 
 
-#Dictionary file
-wordsFile = sys.argv[1]
 #File containings the letters which should be learned every lesson (one lesson per line)
-lettersFile = sys.argv[2]
+lettersFile = sys.argv[1]
 
-with open(wordsFile) as f:
-    #Consider only first column, strip newlines, strip hypnetion information from some dictionaries, set to lower case
-    words = [re.sub('/.*$', '', line.split(' ')[0].rstrip('\n').lower()) for line in f]
-    #Randomize words to avoid having all the variations of the same word in the lesson
-    if RANDOMIZE:
-        shuffle(words)
+#Dictionary file
+if len(sys.argv) > 2:
+    wordsFile = sys.argv[2]
+    with open(wordsFile) as f:
+        #Consider only first column, strip newlines, strip hypnetion information from some dictionaries, set to lower case
+        words = [re.sub('/.*$', '', line.split(' ')[0].rstrip('\n').lower()) for line in f]
+        #Randomize words to avoid having all the variations of the same word in the lesson
+        if RANDOMIZE:
+            shuffle(words)
+else:
+    words = []
 
 with open(lettersFile) as f:
     letters = [line.rstrip('\n') for line in f]
@@ -234,7 +237,6 @@ with open(lettersFile) as f:
 #[letters].txt
 #or
 #ktouch-lessons.txt
-
 if len(sys.argv) > 3:
     lettersIdx = int(sys.argv[3]) - 1
     currentLetters = letters[lettersIdx]
