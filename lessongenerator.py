@@ -60,8 +60,8 @@ def createLesson(currentTxt):
 
     lettersIdx = letters.index(currentTxt)
     previousTxt = ''.join(letters[0:lettersIdx])
-    previousLetters = ''.join(re.findall('[^\W\d_]', previousTxt))
-    currentLetters = ''.join(re.findall('[^\W\d_]', currentTxt))
+    previousLetters = stripPositionMarkers(''.join(re.findall('[^\W\d_]', previousTxt)))
+    currentLetters = stripPositionMarkers(''.join(re.findall('[^\W\d_]', currentTxt)))
 
     #Find if in the currentLetters there is at least a real letter (a non-symbol)
     #and set the regular expression for picking the correct words from the dictionary.
