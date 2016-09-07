@@ -249,15 +249,14 @@ if __name__ == '__main__':
     #ktouch-lessons.txt
     if args['--lesson-number']:
         lettersIdx = int(args['--lesson-number']) - 1
-        currentLetters = letters[lettersIdx]
-        with open(stripPositionMarkers(currentLetters) + '.txt', 'w') as f:
+        letters = [letters[lettersIdx]]
+        outFileName = stripPositionMarkers(letters[0]) + '.txt'
+    else:
+        outFileName = 'ktouch-lessons.txt'
+
+    with open(outFileName, 'w') as f:
+        #First lesson is for sure empty, so it won't be processed, but still we write it to file as placeholder
+        for currentLetters in letters:
             wd = createLesson(currentLetters)
             #Write the lesson to file
             f.write(formatLesson(currentLetters, wd))
-    else:
-        with open('ktouch-lessons.txt', 'w') as f:
-            #First lesson is for sure empty, so it won't be processed, but still we write it to file as placeholder
-            for currentLetters in letters:
-                wd = createLesson(currentLetters)
-                #Write the lesson to file
-                f.write(formatLesson(currentLetters, wd))
