@@ -1,5 +1,16 @@
 #!/usr/bin/python
 
+"""
+KTouch lesson generator.
+
+Usage:
+  ktouch_lesson_generator [options] <letterslist> [<dictionary>]
+
+Options:
+  -l --lesson-number=<n>   Line number of the lesson to be generated.
+  -h --help                Show this screen.
+  -v --version             Show version.
+"""
 #dictionary.txt - A file containing a long list of words (one per line).
 #letters.txt    - A file containing the new letters of each lesson. Every line is a new lesson.
 #                 A position for the symbols can be specified as:
@@ -20,6 +31,7 @@
 
 import sys, re
 import textwrap
+from docopt import docopt
 from random import shuffle, sample
 import itertools
 
@@ -212,42 +224,42 @@ def formatLesson(currentLetters, lessonText):
     out += '\n\n'
     return out
 
+if __name__ == '__main__':
+    args = docopt(__doc__, version='1.0')
 
-#File containings the letters which should be learned every lesson (one lesson per line)
-lettersFile = sys.argv[1]
+    #File containings the letters which should be learned every lesson (one lesson per line)
 
-#Dictionary file
-if len(sys.argv) > 2:
-    wordsFile = sys.argv[2]
-    with open(wordsFile) as f:
-        #Consider only first column, strip newlines, strip hypnetion information from some dictionaries, set to lower case
-        words = [re.sub('/.*$', '', line.split(' ')[0].rstrip('\n').lower()) for line in f]
-        #Randomize words to avoid having all the variations of the same word in the lesson
-        if RANDOMIZE:
-            shuffle(words)
-else:
+
+    #Dictionary file
     words = []
+    if args['<dictionary>']:
+        with open(args['<dictionary>']) as f:
+            #Consider only first column, strip newlines, strip hypnetion information from some dictionaries, set to lower case
+            words = [re.sub('/.*$', '', line.split(' ')[0].rstrip('\n').lower()) for line in f]
+            #Shuffle words to avoid having all the variations of the same word in the
+        	if RANDOMIZE:
+                shuffle(words)
 
-with open(lettersFile) as f:
-    letters = [line.rstrip('\n') for line in f]
+    with open(args['<letterslist>']) as f:
+        letters = [line.rstrip('\n') for line in f]
 
-#If we pass a line number (starting from zero) we create only the lesson for the specified letters
-#otherwise we create all the lessons
-#OUTPUT:
-#[letters].txt
-#or
-#ktouch-lessons.txt
-if len(sys.argv) > 3:
-    lettersIdx = int(sys.argv[3]) - 1
-    currentLetters = letters[lettersIdx]
-    with open(stripPositionMarkers(currentLetters) + '.txt', 'w') as f:
-        wd = createLesson(currentLetters)
-        #Write the lesson to file
-        f.write(formatLesson(currentLetters, wd))
-else:
-    with open('ktouch-lessons.txt', 'w') as f:
-        #First lesson is for sure empty, so it won't be processed, but still we write it to file as placeholder
-        for currentLetters in letters:
+    #If we pass a line number (starting from zero) we create only the lesson for the specified letters
+    #otherwise we create all the lessons
+    #OUTPUT:
+    #[letters].txt
+    #or
+    #ktouch-lessons.txt
+    if args['--lesson-number']:
+        lettersIdx = int(args['--lesson-number']) - 1
+        currentLetters = letters[lettersIdx]
+        with open(stripPositionMarkers(currentLetters) + '.txt', 'w') as f:
             wd = createLesson(currentLetters)
             #Write the lesson to file
             f.write(formatLesson(currentLetters, wd))
+    else:
+        with open('ktouch-lessons.txt', 'w') as f:
+            #First lesson is for sure empty, so it won't be processed, but still we write it to file as placeholder
+            for currentLetters in letters:
+                wd = createLesson(currentLetters)
+                #Write the lesson to file
+                f.write(formatLesson(currentLetters, wd))
