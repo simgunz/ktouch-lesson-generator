@@ -35,7 +35,6 @@ from docopt import docopt
 from random import shuffle, sample
 import itertools
 
-RANDOMIZE = 1               #Shuffle card in source dictionary
 WORDWRAP = 60               #Wrap lesson text at this length
 LETTERSPERLESSON = 2000     #Number of letters in a lesson
 MINWORDLENGTH = 4           #Minimum length a word must have to be included in the lesson
@@ -237,8 +236,7 @@ if __name__ == '__main__':
             #Consider only first column, strip newlines, strip hypnetion information from some dictionaries, set to lower case
             words = [re.sub('/.*$', '', line.split(' ')[0].rstrip('\n').lower()) for line in f]
             #Shuffle words to avoid having all the variations of the same word in the
-        	if RANDOMIZE:
-                shuffle(words)
+            shuffle(words)
 
     with open(args['<letterslist>']) as f:
         letters = [line.rstrip('\n') for line in f]
