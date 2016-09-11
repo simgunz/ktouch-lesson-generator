@@ -104,14 +104,15 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
     #For the first 2-3 lesson the previous block fails, so we need to generate the lesson as
     #combinations/permutations of letters
     if not goodWords:
-        dicto = genCombPerm(currentLetters + previousLetters, max_letters_combination_length)
+        RE_CURRENT_LETTERS = re.compile('[{0}]'.format(''.join(currentLetters)))
+
+        letterCombDict = genCombPerm(currentLetters + previousLetters, max_letters_combination_length)
+        letterCombDict = [w for w in letterCombDict if re.search(RE_CURRENT_LETTERS, w)]
         while lCount < letters_per_lesson:
             #Pick a word randonly from the generated dictionary
-            w = dicto[sample(range(len(dicto)), 1)[0]]
-            #Check that the random word contains the currentLetters
-            if re.search('[{0}]'.format(''.join(currentLetters)), w):
-                lCount += len(w)
-                goodWords.append(w)
+            w = letterCombDict[sample(range(len(letterCombDict)), 1)[0]]
+            lCount += len(w)
+            goodWords.append(w)
 
     #Retrieve the symbols and spread them around the text
     #A position for the symbols can be specified as:
