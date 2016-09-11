@@ -202,8 +202,8 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
         goodWordsText = re.sub('L(\W) ', '\\1', goodWordsText)
         goodWordsText = re.sub(' R(\W)', '\\1', goodWordsText)
         #Avoid symbols to be next to each other
-        goodWordsText = re.sub(' (\W)\W*', ' \\1', goodWordsText)
-        goodWordsText = re.sub('(\W)\W* ', '\\1 ', goodWordsText)
+        goodWordsText = re.sub(' (\W)\W*?( )?', ' \\1\\2', goodWordsText)
+        goodWordsText = re.sub('( )?(\W)\W* ', '\\1\\2 ', goodWordsText)
 
     #Wrap the text to WORDWRAP characters (KTouch required wrapping at 60)
     wrappedLesson = '\n'.join(textwrap.wrap(goodWordsText, word_wrap))
