@@ -60,7 +60,7 @@ def genCombPerm(elements, maxLength):
                             for p in itertools.permutations(c)})
 
 def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_word_length=4,
-    symbols_density=0.05, numbers_density=0.3, include_previous_symbols=True, include_previous_numbers=True,
+    symbols_density=0.05, numbers_density=0.3, include_previous_symbols=False, include_previous_numbers=False,
     max_number_length=3, max_letters_combination_length=4, **ignored):
     '''Create a KTouch lesson for the letters passed as input
     '''
