@@ -45,9 +45,10 @@ from random import shuffle, sample, random
 from schema import Schema, Use, Or
 import itertools
 
+RE_POSITION_MARKERS = re.compile('(LL|RR|LR)')
 
 def stripPositionMarkers(txt):
-    return txt.replace('LL','').replace('RR','').replace('LR','')
+    return re.sub(RE_POSITION_MARKERS, '', txt)
 
 def genCombPerm(elements, maxLength):
     '''Return an array of strings containing different permutations of combinations of the elements
