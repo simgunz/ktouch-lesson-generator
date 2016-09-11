@@ -53,17 +53,11 @@ def stripPositionMarkers(txt):
 def genCombPerm(elements, maxLength):
     '''Return an array of strings containing different permutations of combinations of the elements
     of different lengths up to the specified maximum length
-    E.g. 'ab',2 -> ['a' 'b' 'aa' 'ab' 'ba' 'bb']
+    E.g. 'ab' -> ['a' 'b' 'aa' 'ab' 'ba' 'bb']
     '''
-    cperm=[]
-    perm = []
-    for i in range(maxLength):
-        comb = list(itertools.combinations_with_replacement(''.join(elements), i+1))
-        for c in comb:
-            perm += list(itertools.permutations(c))
-    for n in set(perm):
-        cperm.append(''.join(n))
-    return cperm
+    return list({''.join(p) for i in range(maxLength)
+                            for c in itertools.combinations_with_replacement(''.join(elements), i+1)
+                            for p in itertools.permutations(c)})
 
 
 def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_word_length=4,
