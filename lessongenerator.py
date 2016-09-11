@@ -6,33 +6,44 @@ KTouch lesson generator.
 Usage:
   ktouch_lesson_generator [options] <letterslist> [<dictionary>]
 
-Options:
-  -l --lesson-number=<n>   Line number of the lesson to be generated.
-  -h --help                Show this screen.
-  -v --version             Show version.
-"""
-#dictionary.txt - A file containing a long list of words (one per line).
-#letters.txt    - A file containing the new letters of each lesson. Every line is a new lesson.
-#                 A position for the symbols can be specified as:
-#                   LL: Next to the left word boundary
-#                   RR: Next to the right word boundary
-#                   LR: Next to the left or right word boundary
-#                     : Detached from the word
-#
-#                 Example letters.txt:
-#                 jf
-#                 èy
-#                 ABCDEFGHIJKLMNOPQRSTUVWXYZ
-#                 LR"$
-#                 LL(RR)
+  Generate a set of ktouch lessons, one for each line in <letterslist> file.
+  If dictionary is not specified generates random combinations of letters instead of meaningful words.
 
-#Example python generateLesson dictionary.txt lettersList.txt 5   #Generate lesson on line 5
-#Example python generateLesson dictionary.txt lettersList.txt     #Generate everything
+Options:
+  -n --lesson-number=<n>                   Line number of the lesson to be generated. If not specified all lessons are generated.
+  -w --word-wrap=<n>                       Wrap lesson text at this length. [default: 60]
+     --letters-per-lesson=<n>              Number of letters in a lesson. [default: 2000]
+     --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
+     --symbols-density=<f>                 Amount of symbols that should be put in the lesson. [default: 0.05]
+     --numbers-density=<f>                 Amount of numbers that should be put in the lesson. [default: 0.3]
+     --inlcude-previous-symbols            Set to 0 to include only symbols from the current lesson. [default: False]
+     --include-previous-numbers            Set to 0 to include only numbers from the current lesson. [default: False]
+     --max-number-length=<n>               Maximum length of the generated numbers. [default: 3]
+     --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3 lessons). [default: 4]
+  -h --help                                Show this screen.
+  -v --version                             Show version.
+
+Format of <letterslist> file:
+  <letterslist> is a file containing the new letters of each lesson. Every line is a new lesson.
+  A position for the symbols can be specified as:
+  LL: Next to the left word boundary
+  RR: Next to the right word boundary
+  LR: Next to the left or right word boundary
+    : Detached from the word
+
+  Example letters.txt:
+    jf
+    èy
+    ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    LR"$
+    LL(RR)
+"""
 
 import sys, re
 import textwrap
 from docopt import docopt
 from random import shuffle, sample
+from schema import Schema, Use, Or
 import itertools
 
 WORDWRAP = 60               #Wrap lesson text at this length
@@ -64,7 +75,9 @@ def genCombPerm(elements, maxLength):
     return cperm
 
 
-def createLesson(currentTxt):
+def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_word_length=4,
+    symbols_density=0.05, numbers_density=0.3, include_previous_symbols=True, include_previous_numbers=True,
+    max_number_length=3, max_letters_combination_length=4, **ignored):
     '''Create a KTouch lesson for the letters passed as input
     '''
     print('Processings letters:' + stripPositionMarkers(currentTxt))
@@ -100,17 +113,17 @@ def createLesson(currentTxt):
         #The process stops when we select enough words to fill the lesson as specified by LETTERSPERLESSON
         #or when we exhausted the dictionary.
         if re.match(expression, w):
-            if len(w) > MINWORDLENGTH:
+            if len(w) > min_word_length:
                 lCount += len(w)
                 goodWords.append(w)
-                if lCount > LETTERSPERLESSON:
+                if lCount > letters_per_lesson:
                     break
 
     #For the first 2-3 lesson the previous block fails, so we need to generate the lesson as
     #combinations/permutations of letters
     if not goodWords:
-        dicto = genCombPerm(currentLetters + previousLetters, MAXLETTERCOMBLENGTH)
-        while lCount < LETTERSPERLESSON:
+        dicto = genCombPerm(currentLetters + previousLetters, max_letters_combination_length)
+        while lCount < letters_per_lesson:
             #Pick a word randonly from the generated dictionary
             w = dicto[sample(range(len(dicto)), 1)[0]]
             #Check that the random word contains the currentLetters
@@ -124,7 +137,7 @@ def createLesson(currentTxt):
     #RR: Next to the right word boundary
     #LR: Next to the left or right word boundary
     #: Detached from the word
-    if INCLUDEPREVIOUSSYMBOLS:
+    if include_previous_symbols:
         lettersList = currentTxt + previousTxt
     else:
         lettersList = currentTxt
@@ -135,8 +148,8 @@ def createLesson(currentTxt):
         lrSymbols = re.findall('LR([\W_])', lettersList)
         aloneSymbols = set(symbols) - set( lSymbols + rSymbols + lrSymbols)
 
-        symbolDensity = SYMBOLSDENSITY/len(symbols) # Per symbols
-        nSym = round(LETTERSPERLESSON*symbolDensity)
+        symbolDensity = symbols_density/len(symbols) # Per symbols
+        nSym = round(letters_per_lesson*symbolDensity)
         for s in aloneSymbols:
             #Append nSym times the symbol to the list of good words
             goodWords += [s] * nSym
@@ -171,13 +184,13 @@ def createLesson(currentTxt):
     #Add the numbers
     previousNumbers = re.findall('\d', previousTxt)
     currentNumbers = re.findall('\d', currentTxt)
-    if INCLUDEPREVIOUSNUMBERS:
+    if include_previous_numbers:
         numbers = currentNumbers + previousNumbers
     else:
         numbers = currentNumbers
     if numbers:
-        nNum = round(LETTERSPERLESSON*NUMBERDENSITY)
-        numDictionary = genCombPerm(numbers, MAXNUMBERLENGTH)
+        nNum = round(letters_per_lesson*numbers_density)
+        numDictionary = genCombPerm(numbers, max_number_length)
         for i in range(nNum):
             #Sample some numbers
             n = numDictionary[sample(range(len(numDictionary)), 1)[0]]
@@ -191,14 +204,14 @@ def createLesson(currentTxt):
     #If the array is non empty, check that the lesson is long enough otherwise extend it by duplicating the words
     if goodWords:
         clonedWords = list(goodWords)
-        while len(''.join(goodWords)) < LETTERSPERLESSON:
+        while len(''.join(goodWords)) < letters_per_lesson:
             #Scramble the cloned words to make it less repetitive
             shuffle(clonedWords)
             goodWords += clonedWords
 
     #Now convert the array to text and cut the lesson to the right size
     goodWordsText = ' '.join(goodWords)
-    goodWordsText = re.sub('\S*$', '', goodWordsText[0:LETTERSPERLESSON])
+    goodWordsText = re.sub('\S*$', '', goodWordsText[0:letters_per_lesson])
 
     #Position the symbols to the right place
     if symbols:
@@ -211,7 +224,7 @@ def createLesson(currentTxt):
         goodWordsText = re.sub('(\W)\W* ', '\\1 ', goodWordsText)
 
     #Wrap the text to WORDWRAP characters (KTouch required wrapping at 60)
-    wrappedLesson = '\n'.join(textwrap.wrap(goodWordsText, WORDWRAP))
+    wrappedLesson = '\n'.join(textwrap.wrap(goodWordsText, word_wrap))
 
     return wrappedLesson
 
@@ -225,9 +238,25 @@ def formatLesson(currentLetters, lessonText):
 
 if __name__ == '__main__':
     args = docopt(__doc__, version='1.0')
+    args = Schema({
+        '<letterslist>':  Use(str),#FIXME: Use file validator
+        '<dictionary>': Or(None, Use(str)),#FIXME: Use file validator
+        '--lesson-number': Or(None, Use(int)),
+        '--word-wrap': Or(None, Use(int)),
+        '--letters-per-lesson': Or(None, Use(int)),
+        '--min-word-length': Or(None, Use(int)),
+        '--symbols-density': Or(None, Use(float)),
+        '--numbers-density': Or(None, Use(float)),
+        '--max-number-length': Or(None, Use(int)),
+        '--max-letters-combination-length': Or(None, Use(int)),
+        str: bool, #don’t care
+    }).validate(args)
 
+    argoptions = dict()
+    for k in args.keys():
+        if '--' in k:
+            argoptions[k.strip('--').replace('-', '_')] = args[k]
     #File containings the letters which should be learned every lesson (one lesson per line)
-
 
     #Dictionary file
     words = []
@@ -257,6 +286,6 @@ if __name__ == '__main__':
     with open(outFileName, 'w') as f:
         #First lesson is for sure empty, so it won't be processed, but still we write it to file as placeholder
         for currentLetters in letters:
-            wd = createLesson(currentLetters)
+            wd = createLesson(currentLetters, words, **argoptions)
             #Write the lesson to file
             f.write(formatLesson(currentLetters, wd))
