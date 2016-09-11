@@ -235,7 +235,7 @@ if __name__ == '__main__':
         str: bool, #don’t care
     }).validate(args)
 
-    argoptions = dict()
+    argoptions = {}
     for k in args.keys():
         if '--' in k:
             argoptions[k.strip('--').replace('-', '_')] = args[k]
@@ -260,9 +260,10 @@ if __name__ == '__main__':
     #or
     #ktouch-lessons.txt
     if args['--lesson-number']:
-        lettersIdx = int(args['--lesson-number']) - 1
-        letters = [letters[lettersIdx]]
-        outFileName = stripPositionMarkers(letters[0]) + '.txt'
+        lettersIdx = args['--lesson-number'] - 1
+        letters = letters[lettersIdx]
+        outFileName = stripPositionMarkers(letters) + '.txt'
+        letters = [letters] #Put in array to process in for
     else:
         outFileName = 'ktouch-lessons.txt'
 
