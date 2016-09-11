@@ -41,7 +41,7 @@ Format of <letterslist> file:
 import sys, re
 import textwrap
 from docopt import docopt
-from random import shuffle, sample
+from random import shuffle, sample, random
 from schema import Schema, Use, Or
 import itertools
 
@@ -97,6 +97,9 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
     goodWords = []
     for w in words:
         if any(x.isupper() for x in currentLetters):
+            #If any of the new letters is a capital one we capitalize the first letter of all the words
+            w = w.title()
+        if any(x.isupper() for x in previousLetters) and round(random()):
             #If any of the new letters is a capital one we capitalize the first letter of all the words
             w = w.title()
         #Select a word with at least MINWORDLENGTH letters that contains at least one of the
