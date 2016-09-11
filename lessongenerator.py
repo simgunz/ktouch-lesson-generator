@@ -1,5 +1,4 @@
 #!/usr/bin/python
-
 """
 KTouch lesson generator.
 
@@ -94,16 +93,11 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
     else:
         expression = '[{0}]+$'.format(previousLetters)
 
-    #If one of the new letters is a capital one we capitalize the first letter of all the words
-    if True in list(map(str.isupper, list(currentLetters))):
-        capitalize = True
-    else:
-        capitalize = False
-
     lCount = 0  #Letter counter
     goodWords = []
     for w in words:
-        if capitalize:
+        if any(x.isupper() for x in currentLetters):
+            #If any of the new letters is a capital one we capitalize the first letter of all the words
             w = w.title()
         #Select a word with at least MINWORDLENGTH letters that contains at least one of the
         #letters of the current lesson, and is made only by letters present in the past
