@@ -45,15 +45,6 @@ from random import shuffle, sample, random
 from schema import Schema, Use, Or
 import itertools
 
-WORDWRAP = 60               #Wrap lesson text at this length
-LETTERSPERLESSON = 2000     #Number of letters in a lesson
-MINWORDLENGTH = 4           #Minimum length a word must have to be included in the lesson
-SYMBOLSDENSITY = 0.05       #Amount of symbols that should be put in the lesson
-NUMBERDENSITY  = 0.3        #Amount of numbers that should be put in the lesson
-INCLUDEPREVIOUSSYMBOLS = 1  #Set to 0 to include only symbols from the current lesson
-INCLUDEPREVIOUSNUMBERS = 1  #Set to 0 to include only numbers from the current lesson
-MAXNUMBERLENGTH = 3         #Maximum length of the generated numbers
-MAXLETTERCOMBLENGTH = 4     #Maximum length of the generated combinations of letter (for first 2-3 lessons)
 
 def stripPositionMarkers(txt):
     return txt.replace('LL','').replace('RR','').replace('LR','')
