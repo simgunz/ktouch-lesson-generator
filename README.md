@@ -121,3 +121,13 @@ symbols. The maximum length of the words can be tuned by setting the parameter `
 ```
 python ktouch-lesson-generator.py --max-word-length=6 basic-symbols.txt english-dictionary.txt
 ```
+
+Notes
+-----
+- The auto-generated lessons favour longer combination of letters
+- The learning order of the new letters is important and different combinations need to be tried manually to optimize 
+the result. E.g. in Italian the letter ‘q’ is always followed by the letter ‘u’, so if we try 
+to learn the letter ‘q’ before ‘u’ the resulting lesson won’t contain any word including ‘q’. Another example is when in 
+a lesson we try to learn an Italian common letter like ‘z’ together with an uncommon one like ‘y’; 
+likely the resulting lesson will not contain any word including ‘y’. For this reason it is best to learn `y` and `w` 
+together.
