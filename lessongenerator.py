@@ -46,7 +46,7 @@ import sys, re
 import textwrap
 from docopt import docopt
 from random import shuffle, sample, random
-from schema import Schema, Use, Or
+from voluptuous import Schema, Extra, Coerce, IsFile, Or, error
 import itertools
 
 RE_POSITION_MARKERS = re.compile('(LL|RR|LR)')
@@ -225,20 +225,27 @@ def formatLesson(currentLetters, lessonText):
 
 if __name__ == '__main__':
     args = docopt(__doc__, version='1.0')
-    args = Schema({
-        '<letterslist>':  Use(str),#FIXME: Use file validator
-        '<dictionary>': Or(None, Use(str)),#FIXME: Use file validator
-        '--lesson-number': Or(None, Use(int)),
-        '--word-wrap': Or(None, Use(int)),
-        '--letters-per-lesson': Or(None, Use(int)),
-        '--min-word-length': Or(None, Use(int)),
-        '--symbols-density': Or(None, Use(float)),
-        '--numbers-density': Or(None, Use(float)),
-        '--max-number-length': Or(None, Use(int)),
-        '--max-letters-combination-length': Or(None, Use(int)),
-        str: bool, #don’t care
-    }).validate(args)
-
+    schema = Schema({
+        '<letterslist>':  str, #FIXME: Use IsFile to check if file exists
+        '<dictionary>': Or(None, str),
+        '--lesson-number': Or(None, Coerce(int)),
+        '--output': Or(None, str),
+        '--word-wrap': Or(None, Coerce(int)),
+        '--letters-per-lesson': Or(None, Coerce(int)),
+        '--min-word-length': Or(None, Coerce(int)),
+        '--symbols-density': Or(None, Coerce(float)),
+        '--numbers-density': Or(None, Coerce(float)),
+        '--max-number-length': Or(None, Coerce(int)),
+        '--max-letters-combination-length': Or(None, Coerce(int)),
+        str: bool #FIXME: Use voluptuous.Extra to ignore extra entries
+    })
+    args = schema(args)
+    
+    try:
+        args = schema(args)
+    except error.MultipleInvalid as ex:
+        print("\n".join([e.msg for e in ex.errors]))
+    
     argoptions = {}
     for k in args.keys():
         if '--' in k:
