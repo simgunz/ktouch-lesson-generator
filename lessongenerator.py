@@ -107,7 +107,7 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
 
     #For the first 2-3 lesson the previous block fails, so we need to generate the lesson as
     #combinations/permutations of letters
-    if not goodWords:
+    if currentLetters and not goodWords:
         RE_CURRENT_LETTERS = re.compile('[{0}]'.format(''.join(currentLetters)))
 
         letterCombDict = genCombPerm(currentLetters + previousLetters, max_letters_combination_length)
