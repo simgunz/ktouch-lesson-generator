@@ -18,10 +18,11 @@ Options:
      --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
      --symbols-density=<f>                 Amount of symbols that should be put in the lesson. [default: 1]
      --numbers-density=<f>                 Amount of numbers that should be put in the lesson. [default: 0.3]
-     --inlcude-previous-symbols            Set to 0 to include only symbols from the current lesson. [default: False]
+     --include-previous-symbols            Set to 0 to include only symbols from the current lesson. [default: False]
      --include-previous-numbers            Set to 0 to include only numbers from the current lesson. [default: False]
      --max-number-length=<n>               Maximum length of the generated numbers. [default: 3]
-     --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3 lessons). [default: 4]
+     --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3 
+                                           lessons). [default: 4]
   -h --help                                Show this screen.
   -v --version                             Show version.
 
