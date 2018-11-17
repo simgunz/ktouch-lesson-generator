@@ -16,7 +16,7 @@ Options:
   -w --word-wrap=<n>                       Wrap lesson text at this length. [default: 60]
      --letters-per-lesson=<n>              Number of letters in a lesson. [default: 2000]
      --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
-     --symbols-density=<f>                 Amount of symbols that should be put in the lesson. [default: 0.05]
+     --symbols-density=<f>                 Amount of symbols that should be put in the lesson. [default: 1]
      --numbers-density=<f>                 Amount of numbers that should be put in the lesson. [default: 0.3]
      --inlcude-previous-symbols            Set to 0 to include only symbols from the current lesson. [default: False]
      --include-previous-numbers            Set to 0 to include only numbers from the current lesson. [default: False]
