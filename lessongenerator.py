@@ -217,7 +217,7 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
 
 
 def formatLesson(currentLetters, lessonText):
-    out =  'New letters: {0}\n'.format(stripPositionMarkers(currentLetters))
+    out =  'New characters: {0}\n'.format(stripPositionMarkers(currentLetters))
     out += '------------------------------------------------------------\n'
     out += lessonText
     out += '\n\n'
