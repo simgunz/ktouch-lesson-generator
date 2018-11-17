@@ -12,8 +12,9 @@ Options:
                                            If not specified all lessons are generated.
   -o --output=<outputfile>                 Output file [default: ktouch-lessons.txt]. If the lesson number is specified
                                            the file name will be the [selected characters].txt (e.g fj.txt)
+  -p --plain-text                          Output the lessons in plain text instead of XML                                         
   -w --word-wrap=<n>                       Wrap lesson text at this length. [default: 60]
-     --characters-per-lesson=<n>           Number of characters in a lesson. [default: 2000]
+  -l --characters-per-lesson=<n>           Number of characters in a lesson. [default: 2000]
      --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
      --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]
      --symbols-density=<f>                 Amount of symbols that should be put in the lesson. [default: 1]
@@ -33,13 +34,18 @@ Basic usage
 The lessons to be generated are specified in the text file `<charslist>` by writing in each line the new characters
 to be learned in each lesson.
 
-In each lesson are included all the letters learned in the previous lessons.
+In each lesson all the letters learned in the previous lessons are included.
 
-The output is saved by default in a file called `ktouch-lessons.txt`. The lessons then need to be copied manually
-into KTouch as 
+The output is saved by default in a file called `ktouch-lessons.xml`. This file can be directly imported to KTouch 
+from the Course Editor. After importing the cml file, the title of the course can be edited to set it to something
+meaningful and the keyboard layout MUST be selected in order for the course to show up on the main screen of KTouch when
+that specific keyboard layout is selected.
+
+By specifying the flag `--plain-text` the lessons are saved to a plain text file called `ktouch-lessons.txt`.
+Each lesson can then be copied manually into the KTouch editor. This can be useful when we need to add new lessons to
+an existing course.
+
 The following file generates a full course to learn all the letters in the Italian alphabeth, the extra five English letters, the Italian accented letters, and the capital case version of all the letters.
-
-
 
 ```
 italian_extended.txt:
