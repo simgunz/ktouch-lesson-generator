@@ -11,6 +11,7 @@ Options:
                                            If not specified all lessons are generated.
   -o --output=<outputfile>                 Output file [default: ktouch-lessons.txt]. If the lesson number is specified
                                            the file name will be the [selected characters].txt (e.g fj.txt)
+  -p --plain-text                          Output the lessons in plain text instead of XML                                         
   -w --word-wrap=<n>                       Wrap lesson text at this length. [default: 60]
      --characters-per-lesson=<n>           Number of characters in a lesson. [default: 2000]
      --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
@@ -47,6 +48,8 @@ from docopt import docopt
 from random import shuffle, sample, random
 from voluptuous import Schema, Extra, Coerce, IsFile, Or, error
 import itertools
+import textwrap
+import uuid
 
 RE_POSITION_MARKERS = re.compile('(LL|RR|LR)')
 
@@ -215,11 +218,49 @@ def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, mi
     return wrappedLesson
 
 
-def formatLesson(currentLetters, lessonText):
+def formatLessonPlainText(currentLetters, lessonText):
     out =  'New characters: {0}\n'.format(stripPositionMarkers(currentLetters))
     out += '------------------------------------------------------------\n'
     out += lessonText
     out += '\n\n'
+    return out
+
+def lessonXMLHeader():
+    uniqueid = str(uuid.uuid4())
+    return textwrap.dedent("""\
+        <?xml version="1.0"?>
+          <course>
+            <id>{{{id}}}</id>
+            <title>KTouch-Generator-{shortid}</title>
+            <description></description>
+            <keyboardLayout></keyboardLayout>
+            <lessons>\
+    """).format(id=uniqueid, shortid=uniqueid[:8])
+  
+def lessonXMLFooter():
+    return textwrap.dedent("""
+          </lessons>
+        </course>
+    """)
+    
+def replaceInvalidXMLCharacters(text):
+    text = text.replace('&', '&amp;')
+    text = text.replace('<', '&lt;')
+    return text
+
+def formatLessonXML(currentLetters, lessonText):
+    lessonText = replaceInvalidXMLCharacters(lessonText)
+    currentLetters = replaceInvalidXMLCharacters(currentLetters)
+    currentLetters = stripPositionMarkers(currentLetters)
+    out = """
+      <lesson>
+        <id>{{{id}}}</id>
+        <title>{newChars}</title>
+        <newCharacters>{newChars}</newCharacters>
+        <text>{lessonText}
+        </text>
+      </lesson>\
+      """.format(id=uuid.uuid4(), newChars=currentLetters, lessonText=lessonText)
     return out
 
 if __name__ == '__main__':
@@ -277,12 +318,26 @@ if __name__ == '__main__':
         processletters = [processletters] #Put in array to process in for
     else:
         processletters = letters
-        outFileName = args['--output']
+        outFileName = args['--output'].rsplit( ".", 1 )[ 0 ] 
+        if args['--plain-text']:
+            outFileName += '.txt'
+        else:
+            outFileName += '.xml'
 
+    formattedLesson = ''
     with open(outFileName, 'w') as f:
         #First lesson is for sure empty, so it won't be processed, but still we write it to file as placeholder
         for currentLetters in processletters:
             if currentLetters:
                 wd = createLesson(currentLetters, words, **argoptions)
                 #Write the lesson to file
-                f.write(formatLesson(currentLetters, wd))
+                if args['--plain-text']:
+                    formattedLesson += formatLessonPlainText(currentLetters, wd)
+                else:
+                    formattedLesson += formatLessonXML(currentLetters, wd)
+        if args['--plain-text']:
+            f.write(formattedLesson)
+        else:
+            f.write(lessonXMLHeader())
+            f.write(formattedLesson)
+            f.write(lessonXMLFooter())
