@@ -1,20 +1,18 @@
 #!/usr/bin/python
 """
-KTouch lesson generator.
-
 Usage:
-  ktouch_lesson_generator [options] <letterslist> [<dictionary>]
+  ktouch_lesson_generator [options] <charslist> [<dictionary>]
 
-  Generate a set of ktouch lessons, one for each line in <letterslist> file.
-  If dictionary is not specified generates random combinations of letters instead of meaningful words.
+  Generate a set of ktouch lessons, one for each line in <charslist> file.
+  If <dictionary> is not specified, it generates random combinations of letters instead of meaningful words.
 
 Options:
-  -n --lesson-number=<n>                   Line number of the lesson to be generated. If not specified all lessons are
-                                           generated.
+  -n --lesson-number=<n>                   Line number of <charslist> corresponding ro the lesson to be generated. 
+                                           If not specified all lessons are generated.
   -o --output=<outputfile>                 Output file [default: ktouch-lessons.txt]. If the lesson number is specified
-                                           the file name will be the [selected letters].txt (e.g fj.txt)
+                                           the file name will be the [selected characters].txt (e.g fj.txt)
   -w --word-wrap=<n>                       Wrap lesson text at this length. [default: 60]
-     --letters-per-lesson=<n>              Number of letters in a lesson. [default: 2000]
+     --characters-per-lesson=<n>           Number of characters in a lesson. [default: 2000]
      --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
      --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]
      --symbols-density=<f>                 Amount of symbols that should be put in the lesson. [default: 1]
@@ -64,10 +62,10 @@ def genCombPerm(elements, maxLength):
                             for c in itertools.combinations_with_replacement(''.join(elements), i+1)
                             for p in itertools.permutations(c)})
 
-def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_word_length=4, max_word_length=100,
+def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, min_word_length=4, max_word_length=100,
     symbols_density=0.05, numbers_density=0.3, include_previous_symbols=False, include_previous_numbers=False,
     max_number_length=3, max_letters_combination_length=4, **ignored):
-    '''Create a KTouch lesson for the letters passed as input
+    '''Create a KTouch lesson for the characters passed as input
     '''
     print('Processing: ' + stripPositionMarkers(currentTxt))
 
@@ -103,7 +101,7 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
             if len(w) > min_word_length and len(w) < max_word_length:
                 lCount += len(w)
                 goodWords.append(w)
-                if lCount > letters_per_lesson:
+                if lCount > characters_per_lesson:
                     break
 
     #For the first 2-3 lesson the previous block fails, so we need to generate the lesson as
@@ -113,7 +111,7 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
 
         letterCombDict = genCombPerm(currentLetters + previousLetters, max_letters_combination_length)
         letterCombDict = [w for w in letterCombDict if re.search(RE_CURRENT_LETTERS, w)]
-        while lCount < letters_per_lesson:
+        while lCount < characters_per_lesson:
             #Pick a word randonly from the generated dictionary
             w = letterCombDict[sample(range(len(letterCombDict)), 1)[0]]
             lCount += len(w)
@@ -137,7 +135,7 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
         aloneSymbols = set(symbols) - set( lSymbols + rSymbols + lrSymbols)
 
         symbolDensity = symbols_density/len(symbols) # Per symbols
-        nSym = round(letters_per_lesson*symbolDensity)
+        nSym = round(characters_per_lesson*symbolDensity)
         for s in aloneSymbols:
             #Append nSym times the symbol to the list of good words
             goodWords += [s] * nSym
@@ -177,7 +175,7 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
     else:
         numbers = currentNumbers
     if numbers:
-        nNum = round(letters_per_lesson*numbers_density)
+        nNum = round(characters_per_lesson*numbers_density)
         numDictionary = genCombPerm(numbers, max_number_length)
         for i in range(nNum):
             #Sample some numbers
@@ -192,14 +190,14 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
     #If the array is non empty, check that the lesson is long enough otherwise extend it by duplicating the words
     if goodWords:
         clonedWords = list(goodWords)
-        while len(''.join(goodWords)) < letters_per_lesson:
+        while len(''.join(goodWords)) < characters_per_lesson:
             #Scramble the cloned words to make it less repetitive
             shuffle(clonedWords)
             goodWords += clonedWords
 
     #Now convert the array to text and cut the lesson to the right size
     goodWordsText = ' '.join(goodWords)
-    goodWordsText = re.sub('\S*$', '', goodWordsText[0:letters_per_lesson])
+    goodWordsText = re.sub('\S*$', '', goodWordsText[0:characters_per_lesson])
 
     #Position the symbols to the right place
     if symbols:
@@ -227,12 +225,12 @@ def formatLesson(currentLetters, lessonText):
 if __name__ == '__main__':
     args = docopt(__doc__, version='1.0')
     schema = Schema({
-        '<letterslist>':  str, #FIXME: Use IsFile to check if file exists
+        '<charslist>':  str, #FIXME: Use IsFile to check if file exists
         '<dictionary>': Or(None, str),
         '--lesson-number': Or(None, Coerce(int)),
         '--output': Or(None, str),
         '--word-wrap': Or(None, Coerce(int)),
-        '--letters-per-lesson': Or(None, Coerce(int)),
+        '--characters-per-lesson': Or(None, Coerce(int)),
         '--min-word-length': Or(None, Coerce(int)),
         '--max-word-length': Or(None, Coerce(int)),
         '--symbols-density': Or(None, Coerce(float)),
@@ -252,7 +250,7 @@ if __name__ == '__main__':
     for k in args.keys():
         if '--' in k:
             argoptions[k.strip('--').replace('-', '_')] = args[k]
-    #File containings the letters which should be learned every lesson (one lesson per line)
+    #File containings the characters which should be learned every lesson (one lesson per line)
 
     #Dictionary file
     words = []
@@ -263,7 +261,7 @@ if __name__ == '__main__':
             #Shuffle words to avoid having all the variations of the same word in the
             shuffle(words)
 
-    with open(args['<letterslist>']) as f:
+    with open(args['<charslist>']) as f:
         letters = [line.rstrip('\n') for line in f]
 
     #If we pass a line number (starting from zero) we create only the lesson for the specified letters
