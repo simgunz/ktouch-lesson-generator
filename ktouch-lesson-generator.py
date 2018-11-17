@@ -13,7 +13,7 @@ Options:
                                            the file name will be the [selected characters].txt (e.g fj.txt)
   -p --plain-text                          Output the lessons in plain text instead of XML                                         
   -w --word-wrap=<n>                       Wrap lesson text at this length. [default: 60]
-     --characters-per-lesson=<n>           Number of characters in a lesson. [default: 2000]
+  -l --characters-per-lesson=<n>           Number of characters in a lesson. [default: 2000]
      --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
      --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]
      --symbols-density=<f>                 Amount of symbols that should be put in the lesson. [default: 1]
