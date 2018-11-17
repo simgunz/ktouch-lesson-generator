@@ -82,6 +82,7 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
     else:
         expression = '[{0}]+$'.format(previousLetters)
 
+    lCount = 0
     goodWords = []
     for w in words:
         if any(x.isupper() for x in currentLetters):
