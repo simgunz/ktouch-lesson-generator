@@ -40,7 +40,7 @@ The following file generates a full course to learn all the letters in the Itali
 
 
 ```
-italian_extended.txt.txt:
+italian_extended.txt:
 jf
 kd
 ls
