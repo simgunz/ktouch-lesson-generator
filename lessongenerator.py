@@ -9,7 +9,10 @@ Usage:
   If dictionary is not specified generates random combinations of letters instead of meaningful words.
 
 Options:
-  -n --lesson-number=<n>                   Line number of the lesson to be generated. If not specified all lessons are generated.
+  -n --lesson-number=<n>                   Line number of the lesson to be generated. If not specified all lessons are
+                                           generated.
+  -o --output=<outputfile>                 Output file [default: ktouch-lessons.txt]. If the lesson number is specified
+                                           the file name will be the [selected letters].txt (e.g fj.txt)
   -w --word-wrap=<n>                       Wrap lesson text at this length. [default: 60]
      --letters-per-lesson=<n>              Number of letters in a lesson. [default: 2000]
      --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
@@ -265,7 +268,7 @@ if __name__ == '__main__':
         outFileName = stripPositionMarkers(letters) + '.txt'
         letters = [letters] #Put in array to process in for
     else:
-        outFileName = 'ktouch-lessons.txt'
+        outFileName = args['ktouch-lessons.txt'
 
     with open(outFileName, 'w') as f:
         #First lesson is for sure empty, so it won't be processed, but still we write it to file as placeholder
