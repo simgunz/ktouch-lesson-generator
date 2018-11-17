@@ -2,7 +2,7 @@ Ktouch lesson generator is a script that allows to automatically generate custom
 
 ```
 Usage:
-  ktouch_lesson_generator [options] <charslist> [<dictionary>]
+  ktouch-lesson-generator.py [options] <charslist> [<dictionary>]
 
   Generate a set of ktouch lessons, one for each line in <charslist> file.
   If <dictionary> is not specified, it generates random combinations of letters instead of meaningful words.
@@ -35,6 +35,8 @@ to be learned in each lesson.
 
 In each lesson are included all the letters learned in the previous lessons.
 
+The output is saved by default in a file called `ktouch-lessons.txt`. The lessons then need to be copied manually
+into KTouch as 
 The following file generates a full course to learn all the letters in the Italian alphabeth, the extra five English letters, the Italian accented letters, and the capital case version of all the letters.
 
 

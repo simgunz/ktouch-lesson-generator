@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """
 Usage:
-  ktouch-lesson-generator [options] <charslist> [<dictionary>]
+  ktouch-lesson-generator.py [options] <charslist> [<dictionary>]
 
   Generate a set of ktouch lessons, one for each line in <charslist> file.
   If <dictionary> is not specified, it generates random combinations of letters instead of meaningful words.
