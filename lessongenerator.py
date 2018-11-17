@@ -16,6 +16,7 @@ Options:
   -w --word-wrap=<n>                       Wrap lesson text at this length. [default: 60]
      --letters-per-lesson=<n>              Number of letters in a lesson. [default: 2000]
      --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
+     --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]
      --symbols-density=<f>                 Amount of symbols that should be put in the lesson. [default: 1]
      --numbers-density=<f>                 Amount of numbers that should be put in the lesson. [default: 0.3]
      --include-previous-symbols            Set to 0 to include only symbols from the current lesson. [default: False]
@@ -63,7 +64,7 @@ def genCombPerm(elements, maxLength):
                             for c in itertools.combinations_with_replacement(''.join(elements), i+1)
                             for p in itertools.permutations(c)})
 
-def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_word_length=4,
+def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_word_length=4, max_word_length=100,
     symbols_density=0.05, numbers_density=0.3, include_previous_symbols=False, include_previous_numbers=False,
     max_number_length=3, max_letters_combination_length=4, **ignored):
     '''Create a KTouch lesson for the letters passed as input
@@ -99,7 +100,7 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
         #The process stops when we select enough words to fill the lesson as specified by LETTERSPERLESSON
         #or when we exhausted the dictionary.
         if re.match(expression, w):
-            if len(w) > min_word_length:
+            if len(w) > min_word_length and len(w) < max_word_length:
                 lCount += len(w)
                 goodWords.append(w)
                 if lCount > letters_per_lesson:
@@ -233,6 +234,7 @@ if __name__ == '__main__':
         '--word-wrap': Or(None, Coerce(int)),
         '--letters-per-lesson': Or(None, Coerce(int)),
         '--min-word-length': Or(None, Coerce(int)),
+        '--max-word-length': Or(None, Coerce(int)),
         '--symbols-density': Or(None, Coerce(float)),
         '--numbers-density': Or(None, Coerce(float)),
         '--max-number-length': Or(None, Coerce(int)),
