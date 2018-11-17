@@ -68,7 +68,7 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
     max_number_length=3, max_letters_combination_length=4, **ignored):
     '''Create a KTouch lesson for the letters passed as input
     '''
-    print('Processings letters:' + stripPositionMarkers(currentTxt))
+    print('Processing: ' + stripPositionMarkers(currentTxt))
 
     lettersIdx = letters.index(currentTxt)
     previousTxt = ''.join(letters[0:lettersIdx])
