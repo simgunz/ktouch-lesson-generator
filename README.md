@@ -1,5 +1,33 @@
 Ktouch lesson generator is a script that allows to generate automatically custom lessons for the typing tutor KTouch.
 
+```
+Usage:
+  ktouch_lesson_generator [options] <letterslist> [<dictionary>]
+
+  Generate a set of ktouch lessons, one for each line in <letterslist> file.
+  If dictionary is not specified generates random combinations of letters instead of meaningful words.
+
+Options:
+  -n --lesson-number=<n>                   Line number of the lesson to be generated. If not specified all lessons are
+                                           generated.
+  -o --output=<outputfile>                 Output file [default: ktouch-lessons.txt]. If the lesson number is specified
+                                           the file name will be the [selected letters].txt (e.g fj.txt)
+  -w --word-wrap=<n>                       Wrap lesson text at this length. [default: 60]
+     --letters-per-lesson=<n>              Number of letters in a lesson. [default: 2000]
+     --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
+     --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]
+     --symbols-density=<f>                 Amount of symbols that should be put in the lesson. [default: 1]
+     --numbers-density=<f>                 Amount of numbers that should be put in the lesson. [default: 0.3]
+     --include-previous-symbols            Set to 0 to include only symbols from the current lesson. [default: False]
+     --include-previous-numbers            Set to 0 to include only numbers from the current lesson. [default: False]
+     --max-number-length=<n>               Maximum length of the generated numbers. [default: 3]
+     --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3 
+                                           lessons). [default: 4]
+  -h --help                                Show this screen.
+  -v --version                             Show version.
+
+```
+
 Basic usage
 -----------
 The lessons to be generated are specified in a text file <letterslist> by writing in each line the new letters
@@ -82,6 +110,9 @@ LL[RR]
 LL{RR}
 ```
 
+When we generate lessons to learn symbols it is useful to have normal words in the middle of the text to make the
+typing more natural, but we may want to limit the length of the words to not waste time in typing letters instead of
+symbols. The maximum length of the words can be tuned setting the parameter `--max-word-length=n`.
 ```
-python ktouch-lesson-generator.py basic-symbols.txt english-dictionary.txt
+python ktouch-lesson-generator.py --max-word-length=6 basic-symbols.txt english-dictionary.txt
 ```
