@@ -82,7 +82,6 @@ def createLesson(currentTxt, words, word_wrap=60, letters_per_lesson=2000, min_w
     else:
         expression = '[{0}]+$'.format(previousLetters)
 
-    lCount = 0  #Letter counter
     goodWords = []
     for w in words:
         if any(x.isupper() for x in currentLetters):
@@ -272,15 +271,17 @@ if __name__ == '__main__':
     #ktouch-lessons.txt
     if args['--lesson-number']:
         lettersIdx = args['--lesson-number'] - 1
-        letters = letters[lettersIdx]
-        outFileName = stripPositionMarkers(letters) + '.txt'
-        letters = [letters] #Put in array to process in for
+        processletters = letters[lettersIdx]
+        outFileName = stripPositionMarkers(processletters) + '.txt'
+        processletters = [processletters] #Put in array to process in for
     else:
-        outFileName = args['ktouch-lessons.txt'
+        processletters = letters
+        outFileName = args['--output']
 
     with open(outFileName, 'w') as f:
         #First lesson is for sure empty, so it won't be processed, but still we write it to file as placeholder
-        for currentLetters in letters:
-            wd = createLesson(currentLetters, words, **argoptions)
-            #Write the lesson to file
-            f.write(formatLesson(currentLetters, wd))
+        for currentLetters in processletters:
+            if currentLetters:
+                wd = createLesson(currentLetters, words, **argoptions)
+                #Write the lesson to file
+                f.write(formatLesson(currentLetters, wd))
