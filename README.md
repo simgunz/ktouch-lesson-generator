@@ -1,4 +1,4 @@
-Ktouch lesson generator is a script that allows to automatically generate custom lessons for the typing tutor KTouch.
+Ktouch lesson generator is a script for automatically generating custom lessons for the typing tutor KTouch.
 
 ```
 Usage:
