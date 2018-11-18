@@ -131,6 +131,7 @@ def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, mi
     else:
         lettersList = currentTxt
     symbols = re.findall('[\W_]', lettersList)
+    
     if symbols:
         lSymbols = re.findall('LL([\W_])', lettersList)
         rSymbols = re.findall('RR([\W_])', lettersList)
@@ -197,13 +198,16 @@ def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, mi
             #Scramble the cloned words to make it less repetitive
             shuffle(clonedWords)
             goodWords += clonedWords
-
+            
     #Now convert the array to text and cut the lesson to the right size
     goodWordsText = ' '.join(goodWords)
-    goodWordsText = re.sub('\S*$', '', goodWordsText[0:characters_per_lesson])
-
+    goodWordsText = re.sub('\S*$', '', goodWordsText[:characters_per_lesson])
+    
     #Position the symbols to the right place
     if symbols:
+        # Remove loose symbols at the begin or end of the text
+        goodWordsText = re.sub('^[LR][\W_]\s*', '', goodWordsText)
+        goodWordsText = re.sub('[LR][\W_]\s*$', '', goodWordsText)
         #Escape \ as '\\1' or use raw string as r'\1'
         #Remove the postion markers L and R and the corresponding space to position the symbol
         goodWordsText = re.sub('L(\W) ', '\\1', goodWordsText)
