@@ -94,7 +94,6 @@ python ktouch-lesson-generator.py --characters-per-lesson=1000 italian_extended.
 
 Advanced usage
 --------------
-
 The script can also used to generate lessons to learn symbols instead of letters. Given that some symbols
 usually go in a certain position respect to a word, we can specify the following specifiers in the lesson file:
 
@@ -137,3 +136,7 @@ to learn the letter ‘q’ before ‘u’ the resulting lesson won’t contain 
 a lesson we try to learn an Italian common letter like ‘z’ together with an uncommon one like ‘y’; 
 likely the resulting lesson will not contain any word including ‘y’. For this reason it is best to learn `y` and `w` 
 together.
+
+License MIT
+-----------
+Project License can be found [here](https://github.com/simgnuz/ktouch-lesson-generator/blob/master/LICENSE.md).
