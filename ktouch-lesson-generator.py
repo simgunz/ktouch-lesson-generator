@@ -23,6 +23,9 @@ Options:
      --max-number-length=<n>               Maximum length of the generated numbers. [default: 3]
      --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3 
                                            lessons). [default: 4]
+     --no-shuffle-dict                     Do not shuffle the dictionary file. Useful if the dictionary file is a 
+                                           frequency list and we want to prioritize picking the most common words
+                                           on the top of the list.
   -h --help                                Show this screen.
   -v --version                             Show version.
 
@@ -303,7 +306,8 @@ if __name__ == '__main__':
             #Consider only first column, strip newlines, strip hypnetion information from some dictionaries, set to lower case
             words = [re.sub('/.*$', '', line.split(' ')[0].rstrip('\n').lower()) for line in f]
             #Shuffle words to avoid having all the variations of the same word in the
-            shuffle(words)
+            if not args['--no-shuffle-dict']:
+                shuffle(words)
 
     with open(args['<charslist>']) as f:
         letters = [line.rstrip('\n') for line in f]
