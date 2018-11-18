@@ -139,4 +139,4 @@ together.
 
 License MIT
 -----------
-Project License can be found [here](https://github.com/simgnuz/ktouch-lesson-generator/blob/master/LICENSE.md).
+Project License can be found [here](https://github.com/simgunz/ktouch-lesson-generator/blob/master/LICENSE.md).
