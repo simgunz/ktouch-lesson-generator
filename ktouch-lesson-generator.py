@@ -257,8 +257,7 @@ def formatLessonXML(currentLetters, lessonText):
         <id>{{{id}}}</id>
         <title>{newChars}</title>
         <newCharacters>{newChars}</newCharacters>
-        <text>{lessonText}
-        </text>
+        <text>{lessonText}</text>
       </lesson>\
       """.format(id=uuid.uuid4(), newChars=currentLetters, lessonText=lessonText)
     return out
