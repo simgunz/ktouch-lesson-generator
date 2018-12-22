@@ -289,7 +289,7 @@ if __name__ == '__main__':
         '--numbers-density': Or(None, Coerce(float)),
         '--max-number-length': Or(None, Coerce(int)),
         '--max-letters-combination-length': Or(None, Coerce(int)),
-        str: bool  # FIXME: Use voluptuous.Extra to ignore extra entries
+        str: bool  # Treat all other arguments as bool
     })
     args = schema(args)
     
