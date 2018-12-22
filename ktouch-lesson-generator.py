@@ -61,7 +61,7 @@ def stripPositionMarkers(txt):
     return re.sub(RE_POSITION_MARKERS, '', txt)
 
 
-def genCombPerm(elements, maxLength):
+def generateCharsCombinations(elements, maxLength):
     """Return an array of strings containing different permutations of combinations of the elements
     of different lengths up to the specified maximum length
     E.g. 'ab' -> ['a' 'b' 'aa' 'ab' 'ba' 'bb']
@@ -117,7 +117,7 @@ def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, mi
     if currentLetters and not goodWords:
         RE_CURRENT_LETTERS = re.compile('[{0}]'.format(''.join(currentLetters)))
 
-        letterCombDict = genCombPerm(currentLetters + previousLetters, max_letters_combination_length)
+        letterCombDict = generateCharsCombinations(currentLetters + previousLetters, max_letters_combination_length)
         letterCombDict = [w for w in letterCombDict if re.search(RE_CURRENT_LETTERS, w)]
         while lCount < characters_per_lesson:
             # Pick a word randonly from the generated dictionary
@@ -184,7 +184,7 @@ def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, mi
         numbers = currentNumbers
     if numbers:
         nNum = round(characters_per_lesson*numbers_density)
-        numDictionary = genCombPerm(numbers, max_number_length)
+        numDictionary = generateCharsCombinations(numbers, max_number_length)
         for i in range(nNum):
             # Sample some numbers
             n = numDictionary[sample(range(len(numDictionary)), 1)[0]]
@@ -225,12 +225,12 @@ def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, mi
     return wrappedLesson
 
 
-def formatLessonPlainText(currentLetters, lessonText):
-    out = 'New characters: {0}\n'.format(stripPositionMarkers(currentLetters))
-    out += '------------------------------------------------------------\n'
-    out += lessonText
-    out += '\n\n'
-    return out
+def formatLessonPlainText(currentChars, lessonText):
+    lesson = 'New characters: {0}\n'.format(stripPositionMarkers(currentChars))
+    lesson += '------------------------------------------------------------\n'
+    lesson += lessonText
+    lesson += '\n\n'
+    return lesson
 
 
 def lessonXMLHeader():
@@ -259,19 +259,19 @@ def replaceInvalidXMLCharacters(text):
     return text
 
 
-def formatLessonXML(currentLetters, lessonText):
+def formatLessonXML(currentChars, lessonText):
     lessonText = replaceInvalidXMLCharacters(lessonText)
-    currentLetters = replaceInvalidXMLCharacters(currentLetters)
-    currentLetters = stripPositionMarkers(currentLetters)
-    out = """
+    currentChars = replaceInvalidXMLCharacters(currentChars)
+    currentChars = stripPositionMarkers(currentChars)
+    lesson = """
     <lesson>
         <id>{{{id}}}</id>
         <title>{newChars}</title>
         <newCharacters>{newChars}</newCharacters>
         <text>{lessonText}</text>
     </lesson>\
-    """.format(id=uuid.uuid4(), newChars=currentLetters, lessonText=lessonText)
-    return out
+    """.format(id=uuid.uuid4(), newChars=currentChars, lessonText=lessonText)
+    return lesson
 
 
 if __name__ == '__main__':
