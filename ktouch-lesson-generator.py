@@ -77,8 +77,8 @@ def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, mi
     """Create a KTouch lesson for the characters passed as input."""
     print('Processing: ' + stripPositionMarkers(currentTxt))
 
-    lettersIdx = letters.index(currentTxt)
-    previousTxt = ''.join(letters[0:lettersIdx])
+    lettersIdx = characters.index(currentTxt)
+    previousTxt = ''.join(characters[0:lettersIdx])
     previousLetters = stripPositionMarkers(''.join(re.findall(r'[^\W\d_]', previousTxt)))
     currentLetters = stripPositionMarkers(''.join(re.findall(r'[^\W\d_]', currentTxt)))
 
@@ -292,44 +292,40 @@ if __name__ == '__main__':
         str: bool  # FIXME: Use voluptuous.Extra to ignore extra entries
     })
     args = schema(args)
-
+    
     try:
         args = schema(args)
     except error.MultipleInvalid as ex:
         print("\n".join([e.msg for e in ex.errors]))
-
-    argoptions = {}
-    for k in args.keys():
-        if '--' in k:
-            argoptions[k.strip('--').replace('-', '_')] = args[k]
-    # File containings the characters which should be learned every lesson (one lesson per line)
+        
+    argoptions = {k.strip('--').replace('-', '_'):args[k] for k in args.keys() if '--' in k}
 
     # Dictionary file
     words = []
     if args['<dictionary>']:
         with open(args['<dictionary>']) as f:
             # Consider only first column, strip newlines, strip hypnetion information from some dictionaries
-			words = [re.sub('/.*$', '', line.split(' ')[0].rstrip('\n').lower()) for line in f]
-            # Shuffle words to avoid having all the variations of the same word in the
-            if not args['--no-shuffle-dict']:
-                shuffle(words)
+            words = [re.sub('/.*$', '', line.split(' ')[0].rstrip('\n').lower()) for line in f]
+        # Shuffle words to avoid picking all the variations of the same word
+        if not args['--no-shuffle-dict']:
+            shuffle(words)
 
     with open(args['<charslist>']) as f:
-        letters = [line.rstrip('\n') for line in f]
+        characters = [line.rstrip('\n') for line in f]
 
     # If we pass a line number (starting from zero) we create only the lesson for the specified letters
     # otherwise we create all the lessons
     # OUTPUT:
-    # [letters].txt
+    # [letters].txt/xml
     # or
-    # ktouch-lessons.txt
+    # ktouch-lessons.txt/xml
     if args['--lesson-number']:
-        lettersIdx = args['--lesson-number'] - 1
-        processletters = letters[lettersIdx]
-        outFileName = stripPositionMarkers(processletters) + '.txt'
-        processletters = [processletters]  # Put in array to process in for
+        charsIdx = args['--lesson-number'] - 1
+        selectedChars = characters[charsIdx]
+        outFileName = stripPositionMarkers(selectedChars) + '.txt'
+        selectedChars = [selectedChars]  # Make list to process with for
     else:
-        processletters = letters
+        selectedChars = characters
         outFileName = args['--output'].rsplit(".", 1)[0]
         if args['--plain-text']:
             outFileName += '.txt'
@@ -339,14 +335,14 @@ if __name__ == '__main__':
     formattedLesson = ''
     with open(outFileName, 'w') as f:
         # First lesson is for sure empty, so it won't be processed, but still we write it to file as placeholder
-        for currentLetters in processletters:
-            if currentLetters:
-                wd = createLesson(currentLetters, words, **argoptions)
+        for currentChars in selectedChars:
+            if currentChars:
+                wd = createLesson(currentChars, words, **argoptions)
                 # Write the lesson to file
                 if args['--plain-text']:
-                    formattedLesson += formatLessonPlainText(currentLetters, wd)
+                    formattedLesson += formatLessonPlainText(currentChars, wd)
                 else:
-                    formattedLesson += formatLessonXML(currentLetters, wd)
+                    formattedLesson += formatLessonXML(currentChars, wd)
         if args['--plain-text']:
             f.write(formattedLesson)
         else:
