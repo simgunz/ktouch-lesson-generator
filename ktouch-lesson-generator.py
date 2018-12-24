@@ -7,27 +7,34 @@ Generate a set of ktouch lessons, one for each line in <charslist> file.
 If <dictionary> is not specified, it generates random combinations of letters instead of meaningful words.
 
 Options:
--n --lesson-number=<n>                   Line number of <charslist> corresponding ro the lesson to be generated.
-                                        If not specified all lessons are generated.
--o --output=<outputfile>                 Output file [default: ktouch-lessons.txt]. If the lesson number is specified
-                                        the file name will be the [selected characters].txt (e.g fj.txt)
--p --plain-text                          Output the lessons in plain text instead of XML
--w --word-wrap=<n>                       Wrap lesson text at this length. [default: 60]
--l --characters-per-lesson=<n>           Number of characters in a lesson. [default: 2000]
+-n --lesson-number=<n>                    Line number of <charslist> corresponding ro the lesson to be generated.
+                                          If not specified all lessons are generated.
+-o --output=<outputfile>                  Output file [default: ktouch-lessons.xml/txt]. If the lesson number is specified
+                                          the file name will be the [selected characters].txt (e.g fj.xml/txt)
+-p --plain-text                           Output the lessons in plain text instead of XML
+-w --word-wrap=<n>                        Wrap lesson text at this length. [default: 60]
+-l --characters-per-lesson=<n>            Number of characters in a lesson. [default: 2000]
     --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
     --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]
-    --symbols-density=<f>                 Amount of symbols that should be put in the lesson. [default: 1]
-    --numbers-density=<f>                 Amount of numbers that should be put in the lesson. [default: 0.3]
-    --include-previous-symbols            Set to 0 to include only symbols from the current lesson. [default: False]
+    --symbols-density=<f>                 Fraction of symbols that should be put in the lesson respect the number
+                                          of words. [default: 1]
+    --numbers-density=<f>                 Fraction of numbers that should be put in the lesson respect the number
+                                          of words. [default: 1]
+    --previous-symbols-fraction=<f>       Fraction of symbols from the previous lessons respect the total number of
+                                          symbols. Set to 0 to include only symbols from the current lesson. [default: 0.4]
+    --previous-numbers-fraction=<f>       Fraction of numbers from the previous lessons respect the total number of
+                                          numbers. Set to 0 to include only numbers from the current lesson. [default: 0.4]
     --include-previous-numbers            Set to 0 to include only numbers from the current lesson. [default: False]
     --max-number-length=<n>               Maximum length of the generated numbers. [default: 3]
     --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3
-                                        lessons). [default: 4]
+                                          lessons). [default: 4]
     --no-shuffle-dict                     Do not shuffle the dictionary file. Useful if the dictionary file is a
-                                        frequency list and we want to prioritize picking the most common words
-                                        on the top of the list.
--h --help                                Show this screen.
--v --version                             Show version.
+                                          frequency list and we want to prioritize picking the most common words
+                                          on the top of the list. If the dictionary is sorted alphabetically shuffling
+                                          the words allows avoiding picking all the variations of the same word. 
+                                          [default: False]
+-h --help                                 Show this screen.
+-v --version                              Show version.
 
 Format of <letterslist> file:
 <letterslist> is a file containing the new letters of each lesson. Every line is a new lesson.
@@ -51,6 +58,7 @@ import textwrap
 import uuid
 
 from docopt import docopt
+from math import floor, ceil
 from random import shuffle, sample, random
 from voluptuous import Schema, Coerce, Or, error
 
@@ -71,8 +79,58 @@ def generateCharsCombinations(elements, maxLength):
                 for p in itertools.permutations(c)})
 
 
+def linspace(a, b, n):
+    if n < 2:
+        return b
+    diff = (float(b) - a)/(n - 1)
+    return [diff * i + a  for i in range(n)]
+
+
+def generateNsym(symbols, nSym, prefix=''):
+    symb = list()
+    for s in symbols:
+        symString = '{0}{1}'.format(prefix, s)
+        symb += [symString] * nSym
+    return symb
+        
+        
+def generateSymbols(characters, nWords, symbolDensity):
+    symbols = re.findall(r'[\W_]', characters)
+    if not symbols:
+        return list()
+    lSymbols = re.findall(r'LL([\W_])', characters)
+    rSymbols = re.findall(r'RR([\W_])', characters)
+    lrSymbols = re.findall(r'LR([\W_])', characters)
+    aloneSymbols = set(symbols) - set(lSymbols + rSymbols + lrSymbols)
+
+    # Number of symbols to insert (per-symbol)
+    nSym = round(nWords*symbolDensity/len(symbols))
+   
+    symb = list()
+    symb += generateNsym(aloneSymbols, nSym)
+    symb += generateNsym(lSymbols, nSym, 'L')
+    symb += generateNsym(rSymbols, nSym, 'R')
+    symb += generateNsym(lrSymbols, floor(nSym/2), 'L')
+    symb += generateNsym(lrSymbols, ceil(nSym/2), 'R')
+    return symb
+        
+        
+def addSymbols(characters, words, symbolDensity, previousCharacters='', previousSymbolsFraction=0):
+    nWords = len(words)
+    if not previousCharacters:
+        previousSymbolsFraction = 0
+    symb = generateSymbols(characters, nWords, (1-previousSymbolsFraction)*symbolDensity)
+    symb += generateSymbols(previousCharacters, nWords, previousSymbolsFraction*symbolDensity)        
+    shuffle(symb)
+    
+    idx = linspace(0, len(words), len(symb))
+    for i, s in enumerate(symb):
+        words.insert(round((1+symbolDensity)*idx[i]), s)
+    return words
+
+
 def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, min_word_length=4, max_word_length=100,
-                 symbols_density=0.05, numbers_density=0.3, include_previous_symbols=False,
+                 symbols_density=0.05, numbers_density=0.3, previous_symbols_fraction=0.4,
                  include_previous_numbers=False, max_number_length=3, max_letters_combination_length=4, **ignored):
     """Create a KTouch lesson for the characters passed as input."""
     print('Processing: ' + stripPositionMarkers(currentTxt))
@@ -125,56 +183,8 @@ def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, mi
             lCount += len(w)
             goodWords.append(w)
 
-    # Retrieve the symbols and spread them around the text
-    # A position for the symbols can be specified as:
-    # LL: Next to the left word boundary
-    # RR: Next to the right word boundary
-    # LR: Next to the left or right word boundary
-    # : Detached from the word
-    if include_previous_symbols:
-        lettersList = currentTxt + previousTxt
-    else:
-        lettersList = currentTxt
-    symbols = re.findall(r'[\W_]', lettersList)
-
-    if symbols:
-        lSymbols = re.findall(r'LL([\W_])', lettersList)
-        rSymbols = re.findall(r'RR([\W_])', lettersList)
-        lrSymbols = re.findall(r'LR([\W_])', lettersList)
-        aloneSymbols = set(symbols) - set(lSymbols + rSymbols + lrSymbols)
-
-        symbolDensity = symbols_density/len(symbols)  # Per symbols
-        nSym = round(characters_per_lesson*symbolDensity)
-        for s in aloneSymbols:
-            # Append nSym times the symbol to the list of good words
-            goodWords += [s] * nSym
-
-        for s in lSymbols:
-            # Append nSym times the symbol to the list of good words
-            goodWords += ['L' + s] * nSym
-
-        for s in rSymbols:
-            # Append nSym times the symbol to the list of good words
-            goodWords += ['R' + s] * nSym
-
-        for s in lrSymbols:
-            # Append nSym times the symbol to the list of good words
-            goodWords += ['L' + s] * round(nSym/2) + ['R' + s] * round(nSym/2)
-
-        shuffle(goodWords)
-
-        # Avoid multiple symbols between words
-        newGoodWords = []
-        firstSymbol = 1
-        for w in goodWords:
-            if re.match(r'\w+$', w):
-                newGoodWords.append(w)
-                firstSymbol = 1
-            elif firstSymbol == 1:
-                newGoodWords.append(w)
-                firstSymbol = 0
-        goodWords = newGoodWords
-
+    goodWords = addSymbols(currentTxt, goodWords, symbols_density, previousTxt, previous_symbols_fraction)
+    
     # Add the numbers
     previousNumbers = re.findall(r'\d', previousTxt)
     currentNumbers = re.findall(r'\d', currentTxt)
@@ -202,23 +212,21 @@ def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, mi
             shuffle(clonedWords)
             goodWords += clonedWords
 
-    # Now convert the array to text and cut the lesson to the right size
+    # Now convert the array to text
     goodWordsText = ' '.join(goodWords)
-    goodWordsText = re.sub(r'\S*$', '', goodWordsText[:characters_per_lesson])
 
     # Position the symbols to the right place
-    if symbols:
-        # Remove loose symbols at the begin or end of the text
-        goodWordsText = re.sub(r'^[LR][\W_]\s*', '', goodWordsText)
-        goodWordsText = re.sub(r'[LR][\W_]\s*$', '', goodWordsText)
-        # Escape \ as '\\1' or use raw string as r'\1'
-        # Remove the postion markers L and R and the corresponding space to position the symbol
-        goodWordsText = re.sub(r'L(\W) ', '\\1', goodWordsText)
-        goodWordsText = re.sub(r' R(\W)', '\\1', goodWordsText)
-        # Avoid symbols to be next to each other
-        goodWordsText = re.sub(r' (\W)\W*?( )?', ' \\1\\2', goodWordsText)
-        goodWordsText = re.sub(r'( )?(\W)\W* ', '\\1\\2 ', goodWordsText)
+    # Remove loose symbols at the begin or end of the text
+    goodWordsText = re.sub(r'^[LR][\W_]\s*', '', goodWordsText)
+    goodWordsText = re.sub(r'[LR][\W_]\s*$', '', goodWordsText)
+    # Remove the postion markers L and R and the corresponding space to position the symbol
+    goodWordsText = re.sub(r'L(\W) ', r'\1', goodWordsText)
+    goodWordsText = re.sub(r' R(\W)', r'\1', goodWordsText)
 
+    # Cut the lesson to the right size
+    goodWordsText = goodWordsText[:characters_per_lesson]
+    goodWordsText = re.sub(r'\S*$', '', goodWordsText)
+    
     # Wrap the text to WORDWRAP characters (KTouch required wrapping at 60)
     wrappedLesson = '\n'.join(textwrap.wrap(goodWordsText, word_wrap))
 
@@ -287,18 +295,20 @@ if __name__ == '__main__':
         '--max-word-length': Or(None, Coerce(int)),
         '--symbols-density': Or(None, Coerce(float)),
         '--numbers-density': Or(None, Coerce(float)),
+        '--previous-symbols-fraction': Or(None, Coerce(float)),
+        '--previous-numbers-fraction': Or(None, Coerce(float)),
         '--max-number-length': Or(None, Coerce(int)),
         '--max-letters-combination-length': Or(None, Coerce(int)),
         str: bool  # Treat all other arguments as bool
     })
     args = schema(args)
-    
+
     try:
         args = schema(args)
     except error.MultipleInvalid as ex:
         print("\n".join([e.msg for e in ex.errors]))
-        
-    argoptions = {k.strip('--').replace('-', '_'):args[k] for k in args.keys() if '--' in k}
+
+    argoptions = {k.strip('--').replace('-', '_'): args[k] for k in args.keys() if '--' in k}
 
     # Dictionary file
     words = []
