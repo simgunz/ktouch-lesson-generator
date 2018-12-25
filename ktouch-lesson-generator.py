@@ -70,16 +70,6 @@ def stripPositionMarkers(txt):
     return re.sub(RE_POSITION_MARKERS, '', txt)
 
 
-def generateCharsCombinations(elements, maxLength):
-    """Return an array of strings containing different permutations of combinations of the elements
-    of different lengths up to the specified maximum length
-    E.g. 'ab' -> ['a' 'b' 'aa' 'ab' 'ba' 'bb']
-    """
-    return list({''.join(p) for i in range(maxLength)
-                for c in itertools.combinations_with_replacement(''.join(elements), i+1)
-                for p in itertools.permutations(c)})
-
-
 def linspace(a, b, n):
     if n < 2:
         return b
@@ -87,6 +77,14 @@ def linspace(a, b, n):
     return [diff * i + a  for i in range(n)]
 
 
+def insertUniformly(words, items):
+    """Insert the items between the words in a equidistributed way"""
+    idx = linspace(0, len(words), len(items))
+    symbolDensity = len(items)/len(words)
+    for i, s in enumerate(items):
+        words.insert(round((1+symbolDensity)*idx[i]), s)
+        
+        
 def generateNPrefixedSymbols(symbols, nSym, prefix=''):
     symb = list()
     for s in symbols:
@@ -115,15 +113,7 @@ def generateSymbols(characters, nWords, symbolDensity):
     symb += generateNPrefixedSymbols(lrSymbols, ceil(nSym/2), 'R')
     return symb
         
-        
-def insertUniformly(words, items):
-    """Insert the items between the words in a equidistributed way"""
-    idx = linspace(0, len(words), len(items))
-    symbolDensity = len(items)/len(words)
-    for i, s in enumerate(items):
-        words.insert(round((1+symbolDensity)*idx[i]), s)
-        
-        
+
 def addSymbols(words, characters, symbolDensity, previousCharacters='', previousSymbolsFraction=0):
     nWords = len(words)
     if not previousCharacters:
@@ -132,6 +122,16 @@ def addSymbols(words, characters, symbolDensity, previousCharacters='', previous
     symb += generateSymbols(previousCharacters, nWords, previousSymbolsFraction*symbolDensity)        
     shuffle(symb)
     words = insertUniformly(words, symb)
+
+
+def generateCharsCombinations(elements, maxLength):
+    """Return an array of strings containing different permutations of combinations of the elements
+    of different lengths up to the specified maximum length
+    E.g. 'ab' -> ['a' 'b' 'aa' 'ab' 'ba' 'bb']
+    """
+    return list({''.join(p) for i in range(maxLength)
+                for c in itertools.combinations_with_replacement(''.join(elements), i+1)
+                for p in itertools.permutations(c)})
 
 
 def addNumbers(words, characters, numberDensity, previousCharacters, 
