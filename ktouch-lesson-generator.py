@@ -62,8 +62,11 @@ from math import floor, ceil
 from random import shuffle, sample, random
 from voluptuous import Schema, Coerce, Or, error
 
-RE_POSITION_MARKERS = re.compile('(LL|RR|LR)')
-
+RE_POSITION_MARKERS = re.compile(r'(LL|RR|LR)')
+RE_SYMBOLS = re.compile(r'[\W_]')
+RE_LEFT_SYMBOLS = re.compile(r'LL([\W_])')
+RE_RIGHT_SYMBOLS = re.compile(r'RR([\W_])')
+RE_LEFTRIGHT_SYMBOLS = re.compile(r'LR([\W_])')
 
 def stripPositionMarkers(txt):
     return re.sub(RE_POSITION_MARKERS, '', txt)
@@ -86,7 +89,7 @@ def linspace(a, b, n):
     return [diff * i + a  for i in range(n)]
 
 
-def generateNsym(symbols, nSym, prefix=''):
+def generateNPrefixedSymbols(symbols, nSym, prefix=''):
     symb = list()
     for s in symbols:
         symString = '{0}{1}'.format(prefix, s)
@@ -95,23 +98,23 @@ def generateNsym(symbols, nSym, prefix=''):
         
         
 def generateSymbols(characters, nWords, symbolDensity):
-    symbols = re.findall(r'[\W_]', characters)
+    symbols = re.findall(RE_SYMBOLS, characters)
     if not symbols:
         return list()
-    lSymbols = re.findall(r'LL([\W_])', characters)
-    rSymbols = re.findall(r'RR([\W_])', characters)
-    lrSymbols = re.findall(r'LR([\W_])', characters)
-    aloneSymbols = set(symbols) - set(lSymbols + rSymbols + lrSymbols)
+    lSymbols = re.findall(RE_LEFT_SYMBOLS, characters)
+    rSymbols = re.findall(RE_RIGHT_SYMBOLS, characters)
+    lrSymbols = re.findall(RE_LEFTRIGHT_SYMBOLS, characters)
+    unmarkedSymbols = set(symbols) - set(lSymbols + rSymbols + lrSymbols)
 
     # Number of symbols to insert (per-symbol)
     nSym = round(nWords*symbolDensity/len(symbols))
    
     symb = list()
-    symb += generateNsym(aloneSymbols, nSym)
-    symb += generateNsym(lSymbols, nSym, 'L')
-    symb += generateNsym(rSymbols, nSym, 'R')
-    symb += generateNsym(lrSymbols, floor(nSym/2), 'L')
-    symb += generateNsym(lrSymbols, ceil(nSym/2), 'R')
+    symb += generateNPrefixedSymbols(unmarkedSymbols, nSym)
+    symb += generateNPrefixedSymbols(lSymbols, nSym, 'L')
+    symb += generateNPrefixedSymbols(rSymbols, nSym, 'R')
+    symb += generateNPrefixedSymbols(lrSymbols, floor(nSym/2), 'L')
+    symb += generateNPrefixedSymbols(lrSymbols, ceil(nSym/2), 'R')
     return symb
         
         
@@ -123,6 +126,7 @@ def addSymbols(characters, words, symbolDensity, previousCharacters='', previous
     symb += generateSymbols(previousCharacters, nWords, previousSymbolsFraction*symbolDensity)        
     shuffle(symb)
     
+    # Insert the symbols between the words in a equidistributed way
     idx = linspace(0, len(words), len(symb))
     for i, s in enumerate(symb):
         words.insert(round((1+symbolDensity)*idx[i]), s)
