@@ -7,18 +7,18 @@ Generate a set of ktouch lessons, one for each line in <charslist> file.
 If <dictionary> is not specified, it generates random combinations of letters instead of meaningful words.
 
 Options:
--n --lesson-number=<n>                    Line number of <charslist> corresponding ro the lesson to be generated.
+-n --lesson-number=<n>                    Line number of <charslist> corresponding to the lesson to be generated.
                                           If not specified all lessons are generated.
--o --output=<outputfile>                  Output file [default: ktouch-lessons.xml/txt]. If the lesson number is specified
-                                          the file name will be the [selected characters].txt (e.g fj.xml/txt)
+-o --output=<outputfile>                  Output file name. If the lesson number is specified the file name will be the
+                                          [selected characters].xml/txt (e.g fj.xml/txt). [default: ktouch-lessons.xml/txt]
 -p --plain-text                           Output the lessons in plain text instead of XML
 -w --word-wrap=<n>                        Wrap lesson text at this length. [default: 60]
 -l --characters-per-lesson=<n>            Number of characters in a lesson. [default: 2000]
     --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
     --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]
-    --symbols-density=<f>                 Fraction of symbols that should be put in the lesson respect the number
+    --symbols-density=<f>                 Fraction of symbols that should be put in the lesson respect to the number
                                           of words. [default: 1]
-    --numbers-density=<f>                 Fraction of numbers that should be put in the lesson respect the number
+    --numbers-density=<f>                 Fraction of numbers that should be put in the lesson respect to the number
                                           of words. [default: 1]
     --previous-symbols-fraction=<f>       Fraction of symbols from the previous lessons respect the total number of
                                           symbols. Set to 0 to include only symbols from the current lesson. [default: 0.4]
@@ -36,8 +36,8 @@ Options:
 -h --help                                 Show this screen.
 -v --version                              Show version.
 
-Format of <letterslist> file:
-<letterslist> is a file containing the new letters of each lesson. Every line is a new lesson.
+Format of <charslist> file:
+<charslist> is a file containing the new letters of each lesson. Every line is a new lesson.
 A position for the symbols can be specified as:
 LL: Next to the left word boundary
 RR: Next to the right word boundary
