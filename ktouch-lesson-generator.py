@@ -22,7 +22,7 @@ Options:
                                           symbols. Set to 0 to include only symbols from the current lesson. [default: 0.4]
     --numbers-density=<f>                 Fraction of numbers that should be put in the lesson respect to the number
                                           of words. [default: 1]                                          
-    --include-previous-numbers            Set to 0 to include only numbers from the current lesson. [default: False]
+    --exclude-previous-numbers            Include only numbers from the current lesson.
     --max-number-length=<n>               Maximum length of the generated numbers. [default: 3]
     --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3
                                           lessons). [default: 4]
@@ -30,7 +30,6 @@ Options:
                                           frequency list and we want to prioritize picking the most common words
                                           on the top of the list. If the dictionary is sorted alphabetically shuffling
                                           the words allows avoiding picking all the variations of the same word. 
-                                          [default: False]
 -h --help                                 Show this screen.
 -v --version                              Show version.
 
@@ -135,14 +134,14 @@ def generateCharsCombinations(elements, maxLength):
 
 
 def addNumbers(words, characters, numberDensity, previousCharacters, 
-               includePreviousNumbers=True, max_number_length=3):
+               excludePreviousNumbers=True, max_number_length=3):
     # Add the numbers
     previousNumbers = re.findall(r'\d', previousCharacters)
     currentNumbers = re.findall(r'\d', characters)
-    if includePreviousNumbers:
-        numbers = currentNumbers + previousNumbers
-    else:
+    if excludePreviousNumbers:
         numbers = currentNumbers
+    else:
+        numbers = currentNumbers + previousNumbers
     if not numbers:
         return
     
@@ -157,7 +156,7 @@ def addNumbers(words, characters, numberDensity, previousCharacters,
         
 def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, min_word_length=4, max_word_length=100,
                  symbols_density=0.05, numbers_density=0.3, previous_symbols_fraction=0.4,
-                 include_previous_numbers=False, max_number_length=3, max_letters_combination_length=4, **ignored):
+                 exclude_previous_numbers=False, max_number_length=3, max_letters_combination_length=4, **ignored):
     """Create a KTouch lesson for the characters passed as input."""
     print('Processing: ' + stripPositionMarkers(currentTxt))
 
@@ -211,7 +210,7 @@ def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, mi
 
     addSymbols(goodWords, currentTxt, symbols_density, previousTxt, previous_symbols_fraction)
     
-    addNumbers(goodWords, currentTxt, numbers_density, previousTxt, include_previous_numbers, max_number_length)
+    addNumbers(goodWords, currentTxt, numbers_density, previousTxt, exclude_previous_numbers, max_number_length)
 
     # If the array is non empty, check that the lesson is long enough otherwise extend it by duplicating the words
     if goodWords:
