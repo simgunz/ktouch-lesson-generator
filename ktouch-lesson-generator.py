@@ -18,12 +18,10 @@ Options:
     --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]
     --symbols-density=<f>                 Fraction of symbols that should be put in the lesson respect to the number
                                           of words. [default: 1]
-    --numbers-density=<f>                 Fraction of numbers that should be put in the lesson respect to the number
-                                          of words. [default: 1]
     --previous-symbols-fraction=<f>       Fraction of symbols from the previous lessons respect the total number of
                                           symbols. Set to 0 to include only symbols from the current lesson. [default: 0.4]
-    --previous-numbers-fraction=<f>       Fraction of numbers from the previous lessons respect the total number of
-                                          numbers. Set to 0 to include only numbers from the current lesson. [default: 0.4]
+    --numbers-density=<f>                 Fraction of numbers that should be put in the lesson respect to the number
+                                          of words. [default: 1]                                          
     --include-previous-numbers            Set to 0 to include only numbers from the current lesson. [default: False]
     --max-number-length=<n>               Maximum length of the generated numbers. [default: 3]
     --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3
@@ -59,7 +57,7 @@ import uuid
 
 from docopt import docopt
 from math import floor, ceil
-from random import shuffle, sample, random
+from random import shuffle, choices, sample, random
 from voluptuous import Schema, Coerce, Or, error
 
 RE_POSITION_MARKERS = re.compile(r'(LL|RR|LR)')
@@ -118,21 +116,45 @@ def generateSymbols(characters, nWords, symbolDensity):
     return symb
         
         
-def addSymbols(characters, words, symbolDensity, previousCharacters='', previousSymbolsFraction=0):
+def insertUniformly(words, items):
+    """Insert the items between the words in a equidistributed way"""
+    idx = linspace(0, len(words), len(items))
+    symbolDensity = len(items)/len(words)
+    for i, s in enumerate(items):
+        words.insert(round((1+symbolDensity)*idx[i]), s)
+        
+        
+def addSymbols(words, characters, symbolDensity, previousCharacters='', previousSymbolsFraction=0):
     nWords = len(words)
     if not previousCharacters:
         previousSymbolsFraction = 0
     symb = generateSymbols(characters, nWords, (1-previousSymbolsFraction)*symbolDensity)
     symb += generateSymbols(previousCharacters, nWords, previousSymbolsFraction*symbolDensity)        
     shuffle(symb)
+    words = insertUniformly(words, symb)
+
+
+def addNumbers(words, characters, numberDensity, previousCharacters, 
+               includePreviousNumbers=True, max_number_length=3):
+    # Add the numbers
+    previousNumbers = re.findall(r'\d', previousCharacters)
+    currentNumbers = re.findall(r'\d', characters)
+    if includePreviousNumbers:
+        numbers = currentNumbers + previousNumbers
+    else:
+        numbers = currentNumbers
+    if not numbers:
+        return
     
-    # Insert the symbols between the words in a equidistributed way
-    idx = linspace(0, len(words), len(symb))
-    for i, s in enumerate(symb):
-        words.insert(round((1+symbolDensity)*idx[i]), s)
-    return words
-
-
+    nNum = round(len(words)*numberDensity)
+    numDictionary = generateCharsCombinations(numbers, max_number_length)
+    if currentNumbers:
+        RE_CURRENT_NUMBERS = '[{0}]'.format(''.join(currentNumbers))
+        numDictionary = [x for x in numDictionary if re.search(RE_CURRENT_NUMBERS, x)]
+    selectedNumbers = choices(numDictionary, k=nNum)
+    insertUniformly(words, selectedNumbers)
+        
+        
 def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, min_word_length=4, max_word_length=100,
                  symbols_density=0.05, numbers_density=0.3, previous_symbols_fraction=0.4,
                  include_previous_numbers=False, max_number_length=3, max_letters_combination_length=4, **ignored):
@@ -187,26 +209,9 @@ def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, mi
             lCount += len(w)
             goodWords.append(w)
 
-    goodWords = addSymbols(currentTxt, goodWords, symbols_density, previousTxt, previous_symbols_fraction)
+    addSymbols(goodWords, currentTxt, symbols_density, previousTxt, previous_symbols_fraction)
     
-    # Add the numbers
-    previousNumbers = re.findall(r'\d', previousTxt)
-    currentNumbers = re.findall(r'\d', currentTxt)
-    if include_previous_numbers:
-        numbers = currentNumbers + previousNumbers
-    else:
-        numbers = currentNumbers
-    if numbers:
-        nNum = round(characters_per_lesson*numbers_density)
-        numDictionary = generateCharsCombinations(numbers, max_number_length)
-        for i in range(nNum):
-            # Sample some numbers
-            n = numDictionary[sample(range(len(numDictionary)), 1)[0]]
-            # If current numbers is empty any picked number is ok to include
-            # otherwise check that the selected number contains currentNumbers
-            if not currentNumbers or re.search('[{0}]'.format(''.join(currentNumbers)), n):
-                goodWords.append(n)
-        shuffle(goodWords)
+    addNumbers(goodWords, currentTxt, numbers_density, previousTxt, include_previous_numbers, max_number_length)
 
     # If the array is non empty, check that the lesson is long enough otherwise extend it by duplicating the words
     if goodWords:
@@ -298,9 +303,8 @@ if __name__ == '__main__':
         '--min-word-length': Or(None, Coerce(int)),
         '--max-word-length': Or(None, Coerce(int)),
         '--symbols-density': Or(None, Coerce(float)),
-        '--numbers-density': Or(None, Coerce(float)),
         '--previous-symbols-fraction': Or(None, Coerce(float)),
-        '--previous-numbers-fraction': Or(None, Coerce(float)),
+        '--numbers-density': Or(None, Coerce(float)),
         '--max-number-length': Or(None, Coerce(int)),
         '--max-letters-combination-length': Or(None, Coerce(int)),
         str: bool  # Treat all other arguments as bool
