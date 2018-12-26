@@ -160,8 +160,8 @@ def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, mi
     """Create a KTouch lesson for the characters passed as input."""
     print('Processing: ' + stripPositionMarkers(currentTxt))
 
-    lettersIdx = characters.index(currentTxt)
-    previousTxt = ''.join(characters[0:lettersIdx])
+    lettersIdx = lessonsChars.index(currentTxt)
+    previousTxt = ''.join(lessonsChars[0:lettersIdx])
     previousLetters = stripPositionMarkers(''.join(re.findall(r'[^\W\d_]', previousTxt)))
     currentLetters = stripPositionMarkers(''.join(re.findall(r'[^\W\d_]', currentTxt)))
 
@@ -328,21 +328,17 @@ if __name__ == '__main__':
             shuffle(words)
 
     with open(args['<charslist>']) as f:
-        characters = [line.rstrip('\n') for line in f]
+        lessonsChars = [line.rstrip('\n') for line in f if line]
 
-    # If we pass a line number (starting from zero) we create only the lesson for the specified letters
-    # otherwise we create all the lessons
-    # OUTPUT:
-    # [letters].txt/xml
-    # or
-    # ktouch-lessons.txt/xml
+    # If we pass a line number (starting from one) create only the corresponding lesson 
+    # otherwise create all the lessons
     if args['--lesson-number']:
-        charsIdx = args['--lesson-number'] - 1
-        selectedChars = characters[charsIdx]
+        lessonIdx = args['--lesson-number'] - 1
+        selectedChars = lessonsChars[lessonIdx]
         outFileName = stripPositionMarkers(selectedChars) + '.txt'
         selectedChars = [selectedChars]  # Make list to process with for
     else:
-        selectedChars = characters
+        selectedChars = lessonsChars
         outFileName = args['--output'].rsplit(".", 1)[0]
         if args['--plain-text']:
             outFileName += '.txt'
@@ -353,16 +349,16 @@ if __name__ == '__main__':
     with open(outFileName, 'w') as f:
         # First lesson is for sure empty, so it won't be processed, but still we write it to file as placeholder
         for currentChars in selectedChars:
-            if currentChars:
-                wd = createLesson(currentChars, words, **argoptions)
-                # Write the lesson to file
-                if args['--plain-text']:
-                    formattedLesson += formatLessonPlainText(currentChars, wd)
-                else:
-                    formattedLesson += formatLessonXML(currentChars, wd)
+            wd = createLesson(currentChars, words, **argoptions)
+            # Write the lesson to file
+            if args['--plain-text']:
+                formattedLesson += formatLessonPlainText(currentChars, wd)
+            else:
+                formattedLesson += formatLessonXML(currentChars, wd)
         if args['--plain-text']:
             f.write(formattedLesson)
         else:
             f.write(lessonXMLHeader())
             f.write(formattedLesson)
             f.write(lessonXMLFooter())
+
