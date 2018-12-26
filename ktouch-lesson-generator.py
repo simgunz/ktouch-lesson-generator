@@ -160,12 +160,12 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
                  symbols_density=0.05, numbers_density=0.3, previous_symbols_fraction=0.4,
                  exclude_previous_numbers=False, max_number_length=3, max_letters_combination_length=4, **ignored):
     """Create a KTouch lesson for the characters passed as input."""
-    currentTxt = lessonsChars[lessonIdx]
-    previousTxt = ''.join(lessonsChars[0:lessonIdx])
-    previousLetters = stripPositionMarkers(''.join(re.findall(RE_LETTERS, previousTxt)))
-    currentLetters = stripPositionMarkers(''.join(re.findall(RE_LETTERS, currentTxt)))
+    currentChars = lessonsChars[lessonIdx]
+    previousChars = ''.join(lessonsChars[0:lessonIdx])
+    previousLetters = stripPositionMarkers(''.join(re.findall(RE_LETTERS, previousChars)))
+    currentLetters = stripPositionMarkers(''.join(re.findall(RE_LETTERS, currentChars)))
 
-    print('Processing: ' + stripPositionMarkers(currentTxt))
+    print('Processing: ' + stripPositionMarkers(currentChars))
 
     # Find if in the currentLetters there is at least a real letter (a non-symbol)
     # and set the regular expression for picking the correct words from the dictionary.
@@ -210,9 +210,9 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
             lCount += len(w)
             goodWords.append(w)
 
-    addSymbols(goodWords, currentTxt, symbols_density, previousTxt, previous_symbols_fraction)
+    addSymbols(goodWords, currentChars, symbols_density, previousChars, previous_symbols_fraction)
     
-    addNumbers(goodWords, currentTxt, numbers_density, previousTxt, exclude_previous_numbers, max_number_length)
+    addNumbers(goodWords, currentChars, numbers_density, previousChars, exclude_previous_numbers, max_number_length)
 
     # If the array is non empty, check that the lesson is long enough otherwise extend it by duplicating the words
     if goodWords:
