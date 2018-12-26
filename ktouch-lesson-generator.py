@@ -64,6 +64,8 @@ RE_SYMBOLS = re.compile(r'[\W_]')
 RE_LEFT_SYMBOLS = re.compile(r'LL([\W_])')
 RE_RIGHT_SYMBOLS = re.compile(r'RR([\W_])')
 RE_LEFTRIGHT_SYMBOLS = re.compile(r'LR([\W_])')
+RE_LETTERS = re.compile(r'[^\W\d_]')
+RE_DIGITS = re.compile(r'\d')
 
 def stripPositionMarkers(txt):
     return re.sub(RE_POSITION_MARKERS, '', txt)
@@ -136,8 +138,8 @@ def generateCharsCombinations(elements, maxLength):
 def addNumbers(words, characters, numberDensity, previousCharacters, 
                excludePreviousNumbers=True, max_number_length=3):
     # Add the numbers
-    previousNumbers = re.findall(r'\d', previousCharacters)
-    currentNumbers = re.findall(r'\d', characters)
+    previousNumbers = re.findall(RE_DIGITS, previousCharacters)
+    currentNumbers = re.findall(RE_DIGITS, characters)
     if excludePreviousNumbers:
         numbers = currentNumbers
     else:
@@ -160,8 +162,8 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
     """Create a KTouch lesson for the characters passed as input."""
     currentTxt = lessonsChars[lessonIdx]
     previousTxt = ''.join(lessonsChars[0:lessonIdx])
-    previousLetters = stripPositionMarkers(''.join(re.findall(r'[^\W\d_]', previousTxt)))
-    currentLetters = stripPositionMarkers(''.join(re.findall(r'[^\W\d_]', currentTxt)))
+    previousLetters = stripPositionMarkers(''.join(re.findall(RE_LETTERS, previousTxt)))
+    currentLetters = stripPositionMarkers(''.join(re.findall(RE_LETTERS, currentTxt)))
 
     print('Processing: ' + stripPositionMarkers(currentTxt))
 
