@@ -154,16 +154,16 @@ def addNumbers(words, characters, numberDensity, previousCharacters,
     insertUniformly(words, selectedNumbers)
         
         
-def createLesson(currentTxt, words, word_wrap=60, characters_per_lesson=2000, min_word_length=4, max_word_length=100,
+def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_lesson=2000, min_word_length=4, max_word_length=100,
                  symbols_density=0.05, numbers_density=0.3, previous_symbols_fraction=0.4,
                  exclude_previous_numbers=False, max_number_length=3, max_letters_combination_length=4, **ignored):
     """Create a KTouch lesson for the characters passed as input."""
-    print('Processing: ' + stripPositionMarkers(currentTxt))
-
-    lettersIdx = lessonsChars.index(currentTxt)
-    previousTxt = ''.join(lessonsChars[0:lettersIdx])
+    currentTxt = lessonsChars[lessonIdx]
+    previousTxt = ''.join(lessonsChars[0:lessonIdx])
     previousLetters = stripPositionMarkers(''.join(re.findall(r'[^\W\d_]', previousTxt)))
     currentLetters = stripPositionMarkers(''.join(re.findall(r'[^\W\d_]', currentTxt)))
+
+    print('Processing: ' + stripPositionMarkers(currentTxt))
 
     # Find if in the currentLetters there is at least a real letter (a non-symbol)
     # and set the regular expression for picking the correct words from the dictionary.
@@ -348,8 +348,8 @@ if __name__ == '__main__':
     formattedLesson = ''
     with open(outFileName, 'w') as f:
         # First lesson is for sure empty, so it won't be processed, but still we write it to file as placeholder
-        for currentChars in selectedChars:
-            wd = createLesson(currentChars, words, **argoptions)
+        for lessonIdx, currentChars in enumerate(selectedChars):
+            wd = createLesson(lessonIdx, selectedChars, words, **argoptions)
             # Write the lesson to file
             if args['--plain-text']:
                 formattedLesson += formatLessonPlainText(currentChars, wd)
