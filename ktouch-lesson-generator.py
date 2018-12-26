@@ -291,6 +291,7 @@ def formatLessonXML(currentChars, lessonText):
 
 
 if __name__ == '__main__':
+    # Parse docopt using schema to cast to correct type
     args = docopt(__doc__, version='1.0')
     schema = Schema({
         '<charslist>':  str,  # FIXME: Use IsFile to check if file exists
@@ -314,19 +315,20 @@ if __name__ == '__main__':
         args = schema(args)
     except error.MultipleInvalid as ex:
         print("\n".join([e.msg for e in ex.errors]))
-
+    # Create an argument list from docopt to pass it easily to createLesson
     argoptions = {k.strip('--').replace('-', '_'): args[k] for k in args.keys() if '--' in k}
 
-    # Dictionary file
+    # Acquire the dictionary file
     words = []
     if args['<dictionary>']:
         with open(args['<dictionary>']) as f:
             # Consider only first column, strip newlines, strip hypnetion information from some dictionaries
             words = [re.sub('/.*$', '', line.split(' ')[0].rstrip('\n').lower()) for line in f]
-        # Shuffle words to avoid picking all the variations of the same word
         if not args['--no-shuffle-dict']:
+            # Shuffle words to avoid picking all the variations of the same word
             shuffle(words)
 
+    # Acquire the list of characters corresponding to lessons
     with open(args['<charslist>']) as f:
         lessonsChars = [line.rstrip('\n') for line in f if line]
 
@@ -361,4 +363,3 @@ if __name__ == '__main__':
             f.write(lessonXMLHeader())
             f.write(formattedLesson)
             f.write(lessonXMLFooter())
-
