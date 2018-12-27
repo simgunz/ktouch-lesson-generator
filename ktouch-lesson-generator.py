@@ -80,10 +80,10 @@ def linspace(a, b, n):
 
 def insertUniformly(words, items):
     """Insert the items between the words in a equidistributed way"""
-    idx = linspace(0, len(words), len(items))
     symbolDensity = len(items)/len(words)
+    idx = linspace(0, len(words)*round(1+symbolDensity), len(items))
     for i, s in enumerate(items):
-        words.insert(round((1+symbolDensity)*idx[i]), s)
+        words.insert(idx[i], s)
         
         
 def generateNPrefixedSymbols(symbols, nSym, prefix=''):
