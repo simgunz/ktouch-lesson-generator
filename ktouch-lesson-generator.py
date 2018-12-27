@@ -207,6 +207,12 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
         while lCount < characters_per_lesson:
             # Pick a word randonly from the generated dictionary
             w = letterCombDict[sample(range(len(letterCombDict)), 1)[0]]
+            if any(x.isupper() for x in currentLetters):
+                # If any of the new letters is a capital one we capitalize the first letter of all the words
+                w = w.title()
+            if any(x.isupper() for x in previousLetters) and round(random()):
+                # If any of the new letters is a capital one we capitalize the first letter of all the words
+                w = w.title()
             lCount += len(w)
             goodWords.append(w)
 
