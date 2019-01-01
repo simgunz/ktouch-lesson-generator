@@ -1,53 +1,51 @@
 #!/usr/bin/python
 """
-Usage:
-ktouch-lesson-generator.py [options] <charslist> [<dictionary>]
+Usage: ktouch-lesson-generator.py [options] <charslist> [<dictionary>]
 
 Generate a set of ktouch lessons, one for each line in <charslist> file.
 If <dictionary> is not specified, it generates random combinations of letters instead of meaningful words.
 
 Options:
--n --lesson-number=<n>                    Line number of <charslist> corresponding to the lesson to be generated.
-                                          If not specified all lessons are generated.
--o --output=<outputfile>                  Output file name. If the lesson number is specified the file name will be the
-                                          [selected characters].xml/txt (e.g fj.xml/txt). [default: ktouch-lessons.xml/txt]
--p --plain-text                           Output the lessons in plain text instead of XML
--w --word-wrap=<n>                        Wrap lesson text at this length. [default: 60]
--l --characters-per-lesson=<n>            Number of characters in a lesson. [default: 2000]
-    --exclude-previous-letters            Exclude letters from the previous lessons
-    --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3
-                                          lessons). [default: 4]
-    --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
-    --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]
-    --symbols-density=<f>                 Fraction of symbols that should be put in the lesson respect to the number
-                                          of words. [default: 1]
-    --previous-symbols-fraction=<f>       Fraction of symbols from the previous lessons respect the total number of
-                                          symbols. Set to 0 to include only symbols from the current lesson. [default: 0.4]
-    --numbers-density=<f>                 Fraction of numbers that should be put in the lesson respect to the number
-                                          of words. [default: 1]                                          
-    --exclude-previous-numbers            Include only numbers from the current lesson.
-    --max-number-length=<n>               Maximum length of the generated numbers. [default: 3]
-    --no-shuffle-dict                     Do not shuffle the dictionary file. Useful if the dictionary file is a
-                                          frequency list and we want to prioritize picking the most common words
-                                          on the top of the list. If the dictionary is sorted alphabetically shuffling
-                                          the words allows avoiding picking all the variations of the same word. 
--h --help                                 Show this screen.
--v --version                              Show version.
+  -n --lesson-number=<n>                    Line number of <charslist> corresponding to the lesson to be generated.
+                                            If not specified all lessons are generated.
+  -o --output=<outputfile>                  Output file name. If the lesson number is specified the file name will be the
+                                            [selected characters].xml/txt (e.g fj.xml/txt). [default: ktouch-lessons.xml/txt]
+  -p --plain-text                           Output the lessons in plain text instead of XML
+  -w --word-wrap=<n>                        Wrap lesson text at this length. [default: 60]
+  -l --characters-per-lesson=<n>            Number of characters in a lesson. [default: 2000]
+      --exclude-previous-letters            Exclude letters from the previous lessons
+      --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3
+                                            lessons). [default: 4]
+      --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
+      --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]
+      --symbols-density=<f>                 Fraction of symbols that should be put in the lesson respect to the number
+                                            of words. [default: 1]
+      --previous-symbols-fraction=<f>       Fraction of symbols from the previous lessons respect the total number of
+                                            symbols. Set to 0 to include only symbols from the current lesson. [default: 0.4]
+      --numbers-density=<f>                 Fraction of numbers that should be put in the lesson respect to the number
+                                            of words. [default: 1]                                          
+      --exclude-previous-numbers            Include only numbers from the current lesson.
+      --max-number-length=<n>               Maximum length of the generated numbers. [default: 3]
+      --no-shuffle-dict                     Do not shuffle the dictionary file. Useful if the dictionary file is a
+                                            frequency list and we want to prioritize picking the most common words
+                                            on the top of the list. If the dictionary is sorted alphabetically shuffling
+                                            the words allows avoiding picking all the variations of the same word. 
+  -h --help                                 Show this screen.
+  -v --version                              Show version.
 
 Format of <charslist> file:
-<charslist> is a file containing the new letters of each lesson. Every line is a new lesson.
-A position for the symbols can be specified as:
-LL: Next to the left word boundary
-RR: Next to the right word boundary
-LR: Next to the left or right word boundary
-    : Detached from the word
+  <charslist> is a file containing the new letters of each lesson. Every line is a new lesson.
+  A position for the symbols can be specified as:
+  LL: Next to the left word boundary
+  RR: Next to the right word boundary
+  LR: Next to the left or right word boundary
 
 Example letters.txt:
-    jf
-    èy
-    ABCDEFGHIJKLMNOPQRSTUVWXYZ
-    LR"$
-    LL(RR)
+  jf
+  èy
+  ABCDEFGHIJKLMNOPQRSTUVWXYZ
+  LR"$
+  LL(RR)
 """
 
 import itertools
