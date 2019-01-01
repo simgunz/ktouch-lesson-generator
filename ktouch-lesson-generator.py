@@ -14,6 +14,9 @@ Options:
 -p --plain-text                           Output the lessons in plain text instead of XML
 -w --word-wrap=<n>                        Wrap lesson text at this length. [default: 60]
 -l --characters-per-lesson=<n>            Number of characters in a lesson. [default: 2000]
+    --exclude-previous-letters            Exclude letters from the previous lessons
+    --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3
+                                          lessons). [default: 4]
     --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
     --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]
     --symbols-density=<f>                 Fraction of symbols that should be put in the lesson respect to the number
@@ -24,8 +27,6 @@ Options:
                                           of words. [default: 1]                                          
     --exclude-previous-numbers            Include only numbers from the current lesson.
     --max-number-length=<n>               Maximum length of the generated numbers. [default: 3]
-    --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3
-                                          lessons). [default: 4]
     --no-shuffle-dict                     Do not shuffle the dictionary file. Useful if the dictionary file is a
                                           frequency list and we want to prioritize picking the most common words
                                           on the top of the list. If the dictionary is sorted alphabetically shuffling
@@ -53,6 +54,7 @@ import itertools
 import re
 import textwrap
 import uuid
+import warnings
 
 from docopt import docopt
 from math import floor, ceil
@@ -156,7 +158,8 @@ def addNumbers(words, characters, numberDensity, previousCharacters,
     insertUniformly(words, selectedNumbers)
         
         
-def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_lesson=2000, min_word_length=4, max_word_length=100,
+def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_lesson=2000,
+                  exclude_previous_letters=False, min_word_length=4, max_word_length=100,
                  symbols_density=0.05, numbers_density=0.3, previous_symbols_fraction=0.4,
                  exclude_previous_numbers=False, max_number_length=3, max_letters_combination_length=4, **ignored):
     """Create a KTouch lesson for the characters passed as input."""
@@ -169,83 +172,99 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
 
     # Find if in the currentLetters there is at least a real letter (a non-symbol)
     # and set the regular expression for picking the correct words from the dictionary.
+    RE_MATCHED_WORD = ''
     if currentLetters:
-        expression = '[{0}{1}]*[{0}]+[{0}{1}]*$'.format(currentLetters, previousLetters)
-    else:
-        expression = '[{0}]+$'.format(previousLetters)
+        if exclude_previous_letters:
+            RE_MATCHED_WORD = '[{0}]+$'.format(currentLetters)
+        else:
+            RE_MATCHED_WORD = '[{0}{1}]*[{0}]+[{0}{1}]*$'.format(currentLetters, previousLetters)
+    elif not exclude_previous_letters and previousLetters:
+        RE_MATCHED_WORD = '[{0}]+$'.format(previousLetters)
 
-    lCount = 0
-    goodWords = []
-    for w in words:
-        if any(x.isupper() for x in currentLetters):
-            # If any of the new letters is a capital one we capitalize the first letter of all the words
-            w = w.title()
-        if any(x.isupper() for x in previousLetters) and round(random()):
-            # If any of the new letters is a capital one we capitalize the first letter of all the words
-            w = w.title()
-        # Select a word with at least MINWORDLENGTH letters that contains at least one of the
-        # letters of the current lesson, and is made only by letters present in the past
-        # lessons (beside the current one).
-        # For symbols/numbers the words isn't required to contain them, because they are added after
-        # so we only check against previousLetters.
-        # The process stops when we select enough words to fill the lesson as specified by LETTERSPERLESSON
-        # or when we exhausted the dictionary.
-        if re.match(expression, w):
-            if len(w) > min_word_length and len(w) < max_word_length:
-                lCount += len(w)
-                goodWords.append(w)
-                if lCount > characters_per_lesson:
-                    break
-
-    # For the first 2-3 lesson the previous block fails, so we need to generate the lesson as
-    # combinations/permutations of letters
-    if currentLetters and not goodWords:
-        RE_CURRENT_LETTERS = re.compile('[{0}]'.format(''.join(currentLetters)))
-
-        letterCombDict = generateCharsCombinations(currentLetters + previousLetters, max_letters_combination_length)
-        letterCombDict = [w for w in letterCombDict if re.search(RE_CURRENT_LETTERS, w)]
-        while lCount < characters_per_lesson:
-            # Pick a word randonly from the generated dictionary
-            w = letterCombDict[sample(range(len(letterCombDict)), 1)[0]]
+    selectedWords = []
+    if RE_MATCHED_WORD:
+        lCount = 0
+        for w in words:
             if any(x.isupper() for x in currentLetters):
                 # If any of the new letters is a capital one we capitalize the first letter of all the words
                 w = w.title()
             if any(x.isupper() for x in previousLetters) and round(random()):
                 # If any of the new letters is a capital one we capitalize the first letter of all the words
                 w = w.title()
-            lCount += len(w)
-            goodWords.append(w)
+            # Select a word with at least MINWORDLENGTH letters that contains at least one of the
+            # letters of the current lesson, and is made only by letters present in the past
+            # lessons (beside the current one).
+            # For symbols/numbers the words isn't required to contain them, because they are added after
+            # so we only check against previousLetters.
+            # The process stops when we select enough words to fill the lesson as specified by LETTERSPERLESSON
+            # or when we exhausted the dictionary.
+            if re.match(RE_MATCHED_WORD, w):
+                if len(w) > min_word_length and len(w) < max_word_length:
+                    lCount += len(w)
+                    selectedWords.append(w)
+                    if lCount > characters_per_lesson:
+                        break
 
-    addSymbols(goodWords, currentChars, symbols_density, previousChars, previous_symbols_fraction)
+    # For the first 2-3 lesson the previous block fails, or it is skipped if exclude_previous_letters
+    # is True so we need to generate the lesson as combinations/permutations of letters
+    if not selectedWords:
+        letters = ''
+        if currentLetters:
+            letters += currentLetters
+        if not exclude_previous_letters:
+            letters += previousLetters
+        if letters:
+            letterCombDict = generateCharsCombinations(letters, max_letters_combination_length)
+            if currentLetters:
+                RE_CURRENT_LETTERS = re.compile('[{0}]'.format(''.join(currentLetters)))
+                letterCombDict = [w for w in letterCombDict if re.search(RE_CURRENT_LETTERS, w)]
+            while lCount < characters_per_lesson:
+                # Pick a word randonly from the generated dictionary
+                w = letterCombDict[sample(range(len(letterCombDict)), 1)[0]]
+                if any(x.isupper() for x in currentLetters):
+                    # If any of the new letters is a capital one we capitalize the first letter of all the words
+                    w = w.title()
+                if any(x.isupper() for x in previousLetters) and round(random()):
+                    # If any of the new letters is a capital one we capitalize the first letter of all the words
+                    w = w.title()
+                lCount += len(w)
+                selectedWords.append(w)
     
-    addNumbers(goodWords, currentChars, numbers_density, previousChars, exclude_previous_numbers, max_number_length)
-
-    # If the array is non empty, check that the lesson is long enough otherwise extend it by duplicating the words
-    if goodWords:
-        clonedWords = list(goodWords)
-        while len(''.join(goodWords)) < characters_per_lesson:
+    if selectedWords:
+        addSymbols(selectedWords, currentChars, symbols_density, previousChars, previous_symbols_fraction)
+        addNumbers(selectedWords, currentChars, numbers_density, previousChars, exclude_previous_numbers, max_number_length)
+        # Check that the lesson is long enough otherwise extend it by duplicating the words
+        clonedWords = list(selectedWords)
+        while len(''.join(selectedWords)) < characters_per_lesson:
             # Scramble the cloned words to make it less repetitive
             shuffle(clonedWords)
-            goodWords += clonedWords
+            selectedWords += clonedWords
 
-    # Now convert the array to text
-    goodWordsText = ' '.join(goodWords)
-
-    # Position the symbols to the right place
+    # Convert the array to text
+    goodWordsText = ' '.join(selectedWords)
     # Remove loose symbols at the begin or end of the text
     goodWordsText = re.sub(r'^[LR][\W_]\s*', '', goodWordsText)
     goodWordsText = re.sub(r'[LR][\W_]\s*$', '', goodWordsText)
     # Remove the postion markers L and R and the corresponding space to position the symbol
     goodWordsText = re.sub(r'L(\W) ', r'\1', goodWordsText)
     goodWordsText = re.sub(r' R(\W)', r'\1', goodWordsText)
-
     # Cut the lesson to the right size
     goodWordsText = goodWordsText[:characters_per_lesson]
+    # Remove trailing spaces
     goodWordsText = re.sub(r'\S*$', '', goodWordsText)
     
-    # Wrap the text to WORDWRAP characters (KTouch required wrapping at 60)
+    # Wrap the text (KTouch required wrapping at 60)
     wrappedLesson = '\n'.join(textwrap.wrap(goodWordsText, word_wrap))
 
+    # Issue warnings if the generated lesson is empty
+    if not wrappedLesson:
+        warnMsg = 'Empty lesson generated for "{0}". '.format(stripPositionMarkers(currentChars))
+        if exclude_previous_letters:
+            warnMsg += 'Try without the --exclude_previous_letters flag.'
+        else:
+            warnMsg += 'Try generating a lesson with letters before those with numbers or symbols.'
+        warnings.warn(warnMsg)
+        
     return wrappedLesson
 
 
@@ -318,7 +337,6 @@ if __name__ == '__main__':
         str: bool  # Treat all other arguments as bool
     })
     args = schema(args)
-
     try:
         args = schema(args)
     except error.MultipleInvalid as ex:
