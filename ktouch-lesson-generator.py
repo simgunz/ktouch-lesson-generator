@@ -69,6 +69,16 @@ RE_LEFTRIGHT_SYMBOLS = re.compile(r'LR([\W_])')
 RE_LETTERS = re.compile(r'[^\W\d_]')
 RE_DIGITS = re.compile(r'\d')
 
+def generateCharsCombinations(elements, maxLength):
+    """Return an array of strings containing different permutations of combinations of the elements
+    of different lengths up to the specified maximum length
+    E.g. 'ab' -> ['a' 'b' 'aa' 'ab' 'ba' 'bb']
+    """
+    return list({''.join(p) for i in range(maxLength)
+                for c in itertools.combinations_with_replacement(''.join(elements), i+1)
+                for p in itertools.permutations(c)})
+
+
 def stripPositionMarkers(txt):
     return re.sub(RE_POSITION_MARKERS, '', txt)
 
@@ -127,16 +137,6 @@ def addSymbols(words, characters, symbolDensity, previousCharacters='', previous
     words = insertUniformly(words, symb)
 
 
-def generateCharsCombinations(elements, maxLength):
-    """Return an array of strings containing different permutations of combinations of the elements
-    of different lengths up to the specified maximum length
-    E.g. 'ab' -> ['a' 'b' 'aa' 'ab' 'ba' 'bb']
-    """
-    return list({''.join(p) for i in range(maxLength)
-                for c in itertools.combinations_with_replacement(''.join(elements), i+1)
-                for p in itertools.permutations(c)})
-
-
 def addNumbers(words, characters, numberDensity, previousCharacters, 
                excludePreviousNumbers=True, max_number_length=3):
     # Add the numbers
@@ -188,8 +188,8 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
             if any(x.isupper() for x in currentLetters):
                 # If any of the new letters is a capital one we capitalize the first letter of all the words
                 w = w.title()
-            if any(x.isupper() for x in previousLetters) and round(random()):
-                # If any of the new letters is a capital one we capitalize the first letter of all the words
+            elif any(x.isupper() for x in previousLetters) and round(random()):
+                # If any of the previous letters is a capital one we capitalize the first letter of half the words
                 w = w.title()
             # Select a word with at least MINWORDLENGTH letters that contains at least one of the
             # letters of the current lesson, and is made only by letters present in the past
@@ -224,8 +224,8 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
                 if any(x.isupper() for x in currentLetters):
                     # If any of the new letters is a capital one we capitalize the first letter of all the words
                     w = w.title()
-                if any(x.isupper() for x in previousLetters) and round(random()):
-                    # If any of the new letters is a capital one we capitalize the first letter of all the words
+                elif any(x.isupper() for x in previousLetters) and round(random()):
+                    # If any of the previous letters is a capital one we capitalize the first letter of half the words
                     w = w.title()
                 lCount += len(w)
                 selectedWords.append(w)
