@@ -9,10 +9,14 @@ hr
 go
 bp
 qu
-wx
+wxy
 z
-èy
+èù
 éì
 òà
 ABCDEFGHIJKLMNOPQRSTUVWXYZ
-01234567890
+01
+29
+38
+47
+56
