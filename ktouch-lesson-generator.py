@@ -83,7 +83,7 @@ def insertUniformly(words, items):
     symbolDensity = len(items)/len(words)
     idx = linspace(0, len(words)*round(1+symbolDensity), len(items))
     for i, s in enumerate(items):
-        words.insert(idx[i], s)
+        words.insert(round(idx[i]), s)
         
         
 def generateNPrefixedSymbols(symbols, nSym, prefix=''):
