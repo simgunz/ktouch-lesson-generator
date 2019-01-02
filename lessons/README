@@ -3,9 +3,9 @@ Where multiple commands are present, the lessons have then been combined manuall
 
 ## Italian
 
-python ../ktouch-lesson-generator.py ../lessons/italian.txt ../dictionaries/dict-it.txt
-python ../ktouch-lesson-generator.py  --max-word-length=7 ../lessons/italian_symbols.txt ../dictionaries/dict-it.txt
-python ../ktouch-lesson-generator.py  --max-word-length=7 ../lessons/italian_numbers.txt ../dictionaries/dict-it.txt
+python ../ktouch-lesson-generator.py --lesson-title-prefix=Lezione ../lessons/italian.txt ../dictionaries/dict-it.txt
+python ../ktouch-lesson-generator.py --lesson-title-prefix=Lezione --max-word-length=7 ../lessons/italian_symbols.txt ../dictionaries/dict-it.txt
+python ../ktouch-lesson-generator.py --lesson-title-prefix=Lezione --max-word-length=7 ../lessons/italian_numbers.txt ../dictionaries/dict-it.txt
 
 ## Extended symbols
 
