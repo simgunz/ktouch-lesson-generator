@@ -362,15 +362,15 @@ if __name__ == '__main__':
     if args['--lesson-number']:
         lessonIdx = args['--lesson-number'] - 1
         selectedChars = lessonsChars[lessonIdx]
-        outFileName = stripPositionMarkers(selectedChars) + '.txt'
+        outFileName = stripPositionMarkers(selectedChars)
         selectedChars = [selectedChars]  # Make list to process with for
     else:
         selectedChars = lessonsChars
         outFileName = args['--output'].rsplit(".", 1)[0]
-        if args['--plain-text']:
-            outFileName += '.txt'
-        else:
-            outFileName += '.xml'
+    if args['--plain-text']:
+        outFileName += '.txt'
+    else:
+        outFileName += '.xml'
 
     formattedLesson = ''
     with open(outFileName, 'w') as f:
