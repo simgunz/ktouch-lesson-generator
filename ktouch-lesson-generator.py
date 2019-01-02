@@ -279,19 +279,17 @@ def lessonXMLHeader():
     return textwrap.dedent("""\
         <?xml version="1.0"?>
         <course>
-            <id>{{{id}}}</id>
-            <title>KTouch-Generator-{shortid}</title>
-            <description></description>
-            <keyboardLayout></keyboardLayout>
-            <lessons>\
-    """).format(id=uniqueid, shortid=uniqueid[:8])
+          <id>{{{id}}}</id>
+          <title>KTouch-Generator-{shortid}</title>
+          <description></description>
+          <keyboardLayout></keyboardLayout>
+          <lessons>""").format(id=uniqueid, shortid=uniqueid[:8])
 
 
 def lessonXMLFooter():
     return textwrap.dedent("""
-        </lessons>
-        </course>
-    """)
+          </lessons>
+        </course>""")
 
 
 def replaceInvalidXMLCharacters(text):
@@ -306,12 +304,11 @@ def formatLessonXML(currentChars, lessonText):
     currentChars = stripPositionMarkers(currentChars)
     lesson = """
     <lesson>
-        <id>{{{id}}}</id>
-        <title>{newChars}</title>
-        <newCharacters>{newChars}</newCharacters>
-        <text>{lessonText}</text>
-    </lesson>\
-    """.format(id=uuid.uuid4(), newChars=currentChars, lessonText=lessonText)
+      <id>{{{id}}}</id>
+      <title>{newChars}</title>
+      <newCharacters>{newChars}</newCharacters>
+      <text>{lessonText}</text>
+    </lesson>""".format(id=uuid.uuid4(), newChars=currentChars, lessonText=lessonText)
     return lesson
 
 
