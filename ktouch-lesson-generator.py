@@ -157,8 +157,8 @@ def addNumbers(words, characters, numberDensity, previousCharacters,
         
         
 def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_lesson=2000,
-                  exclude_previous_letters=False, min_word_length=4, max_word_length=100,
-                 symbols_density=0.05, numbers_density=0.3, previous_symbols_fraction=0.4,
+                 exclude_previous_letters=False, min_word_length=4, max_word_length=100,
+                 symbols_density=1, numbers_density=1, previous_symbols_fraction=0.4,
                  exclude_previous_numbers=False, max_number_length=3, max_letters_combination_length=4, **ignored):
     """Create a KTouch lesson for the characters passed as input."""
     currentChars = lessonsChars[lessonIdx]
