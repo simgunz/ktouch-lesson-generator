@@ -1,0 +1,6 @@
+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZàèéìòù
+10
+29
+38
+47
+56

@@ -1,0 +1,12 @@
+In the following the instructions used to generate the lessons for different languages.
+Where multiple commands are present, the lessons have then been combined manually.
+
+## Italian
+
+python ../ktouch-lesson-generator.py ../lessons/italian.txt ../dictionaries/dict-it.txt
+python ../ktouch-lesson-generator.py  --max-word-length=7 ../lessons/italian_symbols.txt ../dictionaries/dict-it.txt
+python ../ktouch-lesson-generator.py  --max-word-length=7 ../lessons/italian_numbers.txt ../dictionaries/dict-it.txt
+
+## Extended symbols
+
+python ../ktouch-lesson-generator.py  --max-word-length=7 ../lessons/symbols_extended.txt ../dictionaries/dict-en_uk.txt
