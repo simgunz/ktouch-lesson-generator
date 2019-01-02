@@ -32,6 +32,8 @@ Options:
                                             on the top of the list. If the dictionary is sorted alphabetically shufflingd we want to prioritize picking the most common words
                                             the words allows avoiding picking all the variations of the same word.  list. If the dictionary is sorted alphabetically shuffling
       --lesson-title-prefix=<prefix>        Prefix for the name of the lesson. [default: Lesson]
+      --balance-words                       Try to collect words with rare letters when the lesson contain a rare and frequent letter
+                                            (e.g 'zy' in Italian will likely pick only words with 'z')
   -h --help                                 Show this screen.avoiding picking all the variations of the same word. 
   -v --version                              Show version.
 

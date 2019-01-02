@@ -31,6 +31,8 @@ Options:
                                             on the top of the list. If the dictionary is sorted alphabetically shuffling
                                             the words allows avoiding picking all the variations of the same word. 
       --lesson-title-prefix=<prefix>        Prefix for the name of the lesson. [default: Lesson]
+      --balance-words                       Try to collect words with rare letters when the lesson contain a rare and frequent letter
+                                            (e.g 'zy' in Italian will likely pick only words with 'z')
   -h --help                                 Show this screen.
   -v --version                              Show version.
 
@@ -160,7 +162,8 @@ def addNumbers(words, characters, numberDensity, previousCharacters,
 def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_lesson=2000,
                  exclude_previous_letters=False, min_word_length=4, max_word_length=100,
                  symbols_density=1, numbers_density=1, previous_symbols_fraction=0.4,
-                 exclude_previous_numbers=False, max_number_length=3, max_letters_combination_length=4, **ignored):
+                 exclude_previous_numbers=False, max_number_length=3, max_letters_combination_length=4,
+                 balance_words=False, **ignored):
     """Create a KTouch lesson for the characters passed as input."""
     currentChars = lessonsChars[lessonIdx]
     previousChars = ''.join(lessonsChars[0:lessonIdx])
@@ -183,6 +186,9 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
     selectedWords = []
     if RE_MATCHED_WORD:
         lCount = 0
+        lCountPerLetter = dict()
+        for x in currentLetters:
+            lCountPerLetter[x] = 0
         for w in words:
             if any(x.isupper() for x in currentLetters):
                 # If any of the new letters is a capital one we capitalize the first letter of all the words
@@ -199,6 +205,19 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
             # or when we exhausted the dictionary.
             if re.match(RE_MATCHED_WORD, w):
                 if len(w) > min_word_length and len(w) < max_word_length:
+                    # Try to collect also words containing not frequent letters
+                    # The result can still be imbalanced but at least there will be some words
+                    # with the less frequent letter
+                    if balance_words:
+                        dropWord = False
+                        for x in currentLetters:
+                            if re.search(x, w):
+                                if lCountPerLetter[x] > characters_per_lesson/len(currentLetters):
+                                    dropWord = True
+                                    break
+                                lCountPerLetter[x] += len(w)
+                        if dropWord:
+                            continue
                     lCount += len(w)
                     selectedWords.append(w)
                     if lCount > characters_per_lesson:
@@ -233,6 +252,7 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
         addSymbols(selectedWords, currentChars, symbols_density, previousChars, previous_symbols_fraction)
         addNumbers(selectedWords, currentChars, numbers_density, previousChars, exclude_previous_numbers, max_number_length)
         # Check that the lesson is long enough otherwise extend it by duplicating the words
+        shuffle(selectedWords)
         clonedWords = list(selectedWords)
         while len(''.join(selectedWords)) < characters_per_lesson:
             # Scramble the cloned words to make it less repetitive
