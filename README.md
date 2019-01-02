@@ -58,7 +58,7 @@ an existing course.
 The following file generates a full course to learn all the letters in the Italian alphabeth, the extra five English letters, the Italian accented letters, and the capital case version of all the letters.
 
 ```
-italian_extended.txt:
+italian.txt:
 jf
 kd
 ls
@@ -70,36 +70,37 @@ hr
 go
 bp
 qu
-wx
-zy
-èé
+wxy
+z
+èù
 éì
 òà
+àèéìòù
 ABCDEFGHIJKLMNOPQRSTUVWXYZ
 ```
 
 To generate the lessons with random permutations  of the letters run the following command
-(the lessons will be written to the file `ktouch-lessons.txt`)
+(the lessons will be written to the file `ktouch-lessons.xml`)
 ```
-python ktouch-lesson-generator.py italian_extended.txt.txt
+python ktouch-lesson-generator.py italian.txt
 ```
 
 If a dictionary file (containining one word per line) is specified, the script generates the lessons
 using meaningful words. The first few lessons are still generated with random permutations of letters
 given that there are not enough letters to pick meaningful words.
 ```
-python ktouch-lesson-generator.py italian_extended.txt.txt dict-it.txt
+python ktouch-lesson-generator.py italian.txt dict-it.txt
 ```
 
 Optionally we can generate a single lesson by specifying the corresponding line number in the `<charslist>` file.
 This will generate a file named with the characters of the selected lesson, in this case `nt.txt`
 ```
-python ktouch-lesson-generator.py -n 5 italian_extended.txt.txt dict-it.txt
+python ktouch-lesson-generator.py -n 5 italian.txt dict-it.txt
 ```
 
 If the generated lessons are too long, we can tune the length of each lesson as follows
 ```
-python ktouch-lesson-generator.py --characters-per-lesson=1000 italian_extended.txt.txt dict-it.txt
+python ktouch-lesson-generator.py --characters-per-lesson=1000 italian.txt dict-it.txt
 ```
 
 Advanced usage
@@ -125,22 +126,30 @@ numbers, but it is necessary to have some letters in the current or previous les
 The following is an example of `<charslist>` for learning new symbols.
 
 ```
-basic-symbols.txt:
+symbols_extended.txt:
 abcdefghijklmnopqrstuvwxyzRR,RR.
-+-
 RR?RR!
-RR:RR;
-LR"LR'
+RR:$
+LR"*
 LL(RR)
 LL[RR]
 LL{RR}
++&
+=~
+LR`\
+/RR@
+^RR;
+%-
+LL#LR'
+_|
+<>
 ```
 
 When we generate lessons to learn symbols, it is useful to have normal words in the middle of the text to make the
 typing more natural, but we may want to limit the length of the words to not waste time in typing letters instead of
 symbols. The maximum length of the words can be tuned by setting the parameter `--max-word-length=n`.
 ```
-python ktouch-lesson-generator.py --max-word-length=6 basic-symbols.txt english-dictionary.txt
+python ktouch-lesson-generator.py --max-word-length=7 symbols_extended.txt dict-en_uk.txt
 ```
 
 Notes
@@ -151,7 +160,7 @@ the result. E.g. in Italian the letter ‘q’ is always followed by the letter 
 to learn the letter ‘q’ before ‘u’ the resulting lesson won’t contain any word including ‘q’. Another example is when in 
 a lesson we try to learn an Italian common letter like ‘z’ together with an uncommon one like ‘y’; 
 likely the resulting lesson will not contain any word including ‘y’. For this reason it is best to learn `y` and `w` 
-together.
+together. It is possible to mitigate this problem specifying the flag `--balance-words`.
 
 License MIT
 -----------
