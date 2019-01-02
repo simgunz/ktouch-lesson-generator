@@ -166,7 +166,7 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
     previousLetters = stripPositionMarkers(''.join(re.findall(RE_LETTERS, previousChars)))
     currentLetters = stripPositionMarkers(''.join(re.findall(RE_LETTERS, currentChars)))
 
-    print('Processing: ' + stripPositionMarkers(currentChars))
+    print('Processing: {0}'.format(stripPositionMarkers(currentChars)))
 
     # Find if in the currentLetters there is at least a real letter (a non-symbol)
     # and set the regular expression for picking the correct words from the dictionary.
