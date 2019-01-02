@@ -31,6 +31,7 @@ Options:
                                             frequency list and we want to prioritize picking the most common wordse dictionary file. Useful if the dictionary file is a
                                             on the top of the list. If the dictionary is sorted alphabetically shufflingd we want to prioritize picking the most common words
                                             the words allows avoiding picking all the variations of the same word.  list. If the dictionary is sorted alphabetically shuffling
+      --lesson-title-prefix=<prefix>        Prefix for the name of the lesson. [default: Lesson]
   -h --help                                 Show this screen.avoiding picking all the variations of the same word. 
   -v --version                              Show version.
 

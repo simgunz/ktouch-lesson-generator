@@ -30,6 +30,7 @@ Options:
                                             frequency list and we want to prioritize picking the most common words
                                             on the top of the list. If the dictionary is sorted alphabetically shuffling
                                             the words allows avoiding picking all the variations of the same word. 
+      --lesson-title-prefix=<prefix>        Prefix for the name of the lesson. [default: Lesson]
   -h --help                                 Show this screen.
   -v --version                              Show version.
 
@@ -298,17 +299,19 @@ def replaceInvalidXMLCharacters(text):
     return text
 
 
-def formatLessonXML(currentChars, lessonText):
+def formatLessonXML(currentChars, lessonText, lessonNumber='', lessonPrefix='Lesson'):
     lessonText = replaceInvalidXMLCharacters(lessonText)
     currentChars = replaceInvalidXMLCharacters(currentChars)
     currentChars = stripPositionMarkers(currentChars)
+    lessonTitle = '{prefix} {number} - {newChars}'.format(
+        prefix=lessonPrefix, number=lessonNumber, newChars=currentChars)
     lesson = """
     <lesson>
       <id>{{{id}}}</id>
-      <title>{newChars}</title>
+      <title>{title}</title>
       <newCharacters>{newChars}</newCharacters>
       <text>{lessonText}</text>
-    </lesson>""".format(id=uuid.uuid4(), newChars=currentChars, lessonText=lessonText)
+    </lesson>""".format(id=uuid.uuid4(), title=lessonTitle, newChars=currentChars, lessonText=lessonText)
     return lesson
 
 
@@ -329,6 +332,7 @@ if __name__ == '__main__':
         '--numbers-density': Or(None, Coerce(float)),
         '--max-number-length': Or(None, Coerce(int)),
         '--max-letters-combination-length': Or(None, Coerce(int)),
+        '--lesson-title-prefix': Or(None, str),
         str: bool  # Treat all other arguments as bool
     })
     args = schema(args)
@@ -377,7 +381,7 @@ if __name__ == '__main__':
             if args['--plain-text']:
                 formattedLesson += formatLessonPlainText(currentChars, wd)
             else:
-                formattedLesson += formatLessonXML(currentChars, wd)
+                formattedLesson += formatLessonXML(currentChars, wd, lessonIdx, args['--lesson-title-prefix'])
         if args['--plain-text']:
             f.write(formattedLesson)
         else:
