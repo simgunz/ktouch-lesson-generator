@@ -381,7 +381,7 @@ if __name__ == '__main__':
             if args['--plain-text']:
                 formattedLesson += formatLessonPlainText(currentChars, wd)
             else:
-                formattedLesson += formatLessonXML(currentChars, wd, lessonIdx, args['--lesson-title-prefix'])
+                formattedLesson += formatLessonXML(currentChars, wd, lessonIdx + 1, args['--lesson-title-prefix'])
         if args['--plain-text']:
             f.write(formattedLesson)
         else:
