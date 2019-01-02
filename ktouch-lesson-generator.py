@@ -115,7 +115,7 @@ def generateSymbols(characters, nWords, symbolDensity):
 
     # Number of symbols to insert (per-symbol)
     nSym = round(nWords*symbolDensity/len(symbols))
-   
+    
     symb = list()
     symb += generateNPrefixedSymbols(unmarkedSymbols, nSym)
     symb += generateNPrefixedSymbols(lSymbols, nSym, 'L')
@@ -127,7 +127,7 @@ def generateSymbols(characters, nWords, symbolDensity):
 
 def addSymbols(words, characters, symbolDensity, previousCharacters='', previousSymbolsFraction=0):
     nWords = len(words)
-    if not previousCharacters:
+    if not re.search(RE_SYMBOLS, previousCharacters):
         previousSymbolsFraction = 0
     symb = generateSymbols(characters, nWords, (1-previousSymbolsFraction)*symbolDensity)
     symb += generateSymbols(previousCharacters, nWords, previousSymbolsFraction*symbolDensity)        
