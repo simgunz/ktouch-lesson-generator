@@ -7,35 +7,37 @@ Generate a set of ktouch lessons, one for each line in <charslist> file.
 If <dictionary> is not specified, it generates random combinations of letters instead of meaningful words.rslist> file.
 
 Options:
-  -n --lesson-number=<n>                    Line number of <charslist> corresponding to the lesson to be generated.
-                                            If not specified all lessons are generated.harslist> corresponding to the lesson to be generated.
-  -o --output=<outputfile>                  Output file name. If the lesson number is specified the file name will be theall lessons are generated.
-                                            [selected characters].xml/txt (e.g fj.xml/txt). [default: ktouch-lessons.xml/txt] If the lesson number is specified the file name will be the
-  -p --plain-text                           Output the lessons in plain text instead of XMLers].xml/txt (e.g fj.xml/txt). [default: ktouch-lessons.xml/txt]
-  -w --word-wrap=<n>                        Wrap lesson text at this length. [default: 60]s in plain text instead of XML
-  -l --characters-per-lesson=<n>            Number of characters in a lesson. [default: 2000]at this length. [default: 60]
-      --exclude-previous-letters            Exclude letters from the previous lessonsers in a lesson. [default: 2000]
-      --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3rom the previous lessons
-                                            lessons). [default: 4] the generated combinations of letter (for first 2-3
-      --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]t: 4]
-      --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]word must have to be included in the lesson. [default: 4]
-      --symbols-density=<f>                 Fraction of symbols that should be put in the lesson respect to the numberword must have to be included in the lesson. [default: 100]
-                                            of words. [default: 1]ls that should be put in the lesson respect to the number
-      --previous-symbols-fraction=<f>       Fraction of symbols from the previous lessons respect the total number oft: 1]
-                                            symbols. Set to 0 to include only symbols from the current lesson. [default: 0.4]ls from the previous lessons respect the total number of
-      --numbers-density=<f>                 Fraction of numbers that should be put in the lesson respect to the number to include only symbols from the current lesson. [default: 0.4]
-                                            of words. [default: 1]                                          rs that should be put in the lesson respect to the number
-      --exclude-previous-numbers            Include only numbers from the current lesson.t: 1]                                          
-      --max-number-length=<n>               Maximum length of the generated numbers. [default: 3]ers from the current lesson.
-      --no-shuffle-dict                     Do not shuffle the dictionary file. Useful if the dictionary file is a the generated numbers. [default: 3]
-                                            frequency list and we want to prioritize picking the most common wordse dictionary file. Useful if the dictionary file is a
-                                            on the top of the list. If the dictionary is sorted alphabetically shufflingd we want to prioritize picking the most common words
-                                            the words allows avoiding picking all the variations of the same word.  list. If the dictionary is sorted alphabetically shuffling
-      --lesson-title-prefix=<prefix>        Prefix for the name of the lesson. [default: Lesson]
-      --balance-words                       Try to collect words with rare letters when the lesson contain a rare and frequent letter
-                                            (e.g 'zy' in Italian will likely pick only words with 'z')
-  -h --help                                 Show this screen.avoiding picking all the variations of the same word. 
-  -v --version                              Show version.
+-n --lesson-number=<n>                    Line number of <charslist> corresponding to the lesson to be generated.
+                                            If not specified all lessons are generated.
+-o --output=<outputfile>                  Output file name. If the lesson number is specified the file name will be the
+                                            [selected characters].xml/txt (e.g fj.xml/txt).
+                                            [default: ktouch-lessons.xml/txt]
+-p --plain-text                           Output the lessons in plain text instead of XML
+-w --word-wrap=<n>                        Wrap lesson text at this length. [default: 60]
+-l --characters-per-lesson=<n>            Number of characters in a lesson. [default: 2000]
+    --exclude-previous-letters            Exclude letters from the previous lessons
+    --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3
+                                            lessons). [default: 4]
+    --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
+    --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]
+    --symbols-density=<f>                 Fraction of symbols that should be put in the lesson respect to the number
+                                            of words. [default: 1]
+    --previous-symbols-fraction=<f>       Fraction of symbols from the previous lessons respect the total number of
+                                            symbols. Set to 0 to include only symbols from the current lesson.
+                                            [default: 0.4]
+    --numbers-density=<f>                 Fraction of numbers that should be put in the lesson respect to the number
+                                            of words. [default: 1]
+    --exclude-previous-numbers            Include only numbers from the current lesson.
+    --max-number-length=<n>               Maximum length of the generated numbers. [default: 3]
+    --no-shuffle-dict                     Do not shuffle the dictionary file. Useful if the dictionary file is a
+                                            frequency list and we want to prioritize picking the most common words
+                                            on the top of the list. If the dictionary is sorted alphabetically shuffling
+                                            the words allows avoiding picking all the variations of the same word.
+    --lesson-title-prefix=<prefix>        Prefix for the name of the lesson. [default: Lesson]
+    --balance-words                       Try to collect words with rare letters when the lesson contain a rare and
+                                            frequent letter (e.g 'zy' in Italian will likely pick only words with 'z')
+-h --help                                 Show this screen.
+-v --version                              Show version.
 
 ```
 

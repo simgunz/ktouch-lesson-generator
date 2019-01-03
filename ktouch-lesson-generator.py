@@ -6,49 +6,51 @@ Generate a set of ktouch lessons, one for each line in <charslist> file.
 If <dictionary> is not specified, it generates random combinations of letters instead of meaningful words.
 
 Options:
-  -n --lesson-number=<n>                    Line number of <charslist> corresponding to the lesson to be generated.
+-n --lesson-number=<n>                    Line number of <charslist> corresponding to the lesson to be generated.
                                             If not specified all lessons are generated.
-  -o --output=<outputfile>                  Output file name. If the lesson number is specified the file name will be the
-                                            [selected characters].xml/txt (e.g fj.xml/txt). [default: ktouch-lessons.xml/txt]
-  -p --plain-text                           Output the lessons in plain text instead of XML
-  -w --word-wrap=<n>                        Wrap lesson text at this length. [default: 60]
-  -l --characters-per-lesson=<n>            Number of characters in a lesson. [default: 2000]
-      --exclude-previous-letters            Exclude letters from the previous lessons
-      --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3
+-o --output=<outputfile>                  Output file name. If the lesson number is specified the file name will be the
+                                            [selected characters].xml/txt (e.g fj.xml/txt).
+                                            [default: ktouch-lessons.xml/txt]
+-p --plain-text                           Output the lessons in plain text instead of XML
+-w --word-wrap=<n>                        Wrap lesson text at this length. [default: 60]
+-l --characters-per-lesson=<n>            Number of characters in a lesson. [default: 2000]
+    --exclude-previous-letters            Exclude letters from the previous lessons
+    --max-letters-combination-length=<n>  Maximum length of the generated combinations of letter (for first 2-3
                                             lessons). [default: 4]
-      --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
-      --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]
-      --symbols-density=<f>                 Fraction of symbols that should be put in the lesson respect to the number
+    --min-word-length=<n>                 Minimum length a word must have to be included in the lesson. [default: 4]
+    --max-word-length=<n>                 Maximum length a word must have to be included in the lesson. [default: 100]
+    --symbols-density=<f>                 Fraction of symbols that should be put in the lesson respect to the number
                                             of words. [default: 1]
-      --previous-symbols-fraction=<f>       Fraction of symbols from the previous lessons respect the total number of
-                                            symbols. Set to 0 to include only symbols from the current lesson. [default: 0.4]
-      --numbers-density=<f>                 Fraction of numbers that should be put in the lesson respect to the number
-                                            of words. [default: 1]                                          
-      --exclude-previous-numbers            Include only numbers from the current lesson.
-      --max-number-length=<n>               Maximum length of the generated numbers. [default: 3]
-      --no-shuffle-dict                     Do not shuffle the dictionary file. Useful if the dictionary file is a
+    --previous-symbols-fraction=<f>       Fraction of symbols from the previous lessons respect the total number of
+                                            symbols. Set to 0 to include only symbols from the current lesson.
+                                            [default: 0.4]
+    --numbers-density=<f>                 Fraction of numbers that should be put in the lesson respect to the number
+                                            of words. [default: 1]
+    --exclude-previous-numbers            Include only numbers from the current lesson.
+    --max-number-length=<n>               Maximum length of the generated numbers. [default: 3]
+    --no-shuffle-dict                     Do not shuffle the dictionary file. Useful if the dictionary file is a
                                             frequency list and we want to prioritize picking the most common words
                                             on the top of the list. If the dictionary is sorted alphabetically shuffling
-                                            the words allows avoiding picking all the variations of the same word. 
-      --lesson-title-prefix=<prefix>        Prefix for the name of the lesson. [default: Lesson]
-      --balance-words                       Try to collect words with rare letters when the lesson contain a rare and frequent letter
-                                            (e.g 'zy' in Italian will likely pick only words with 'z')
-  -h --help                                 Show this screen.
-  -v --version                              Show version.
+                                            the words allows avoiding picking all the variations of the same word.
+    --lesson-title-prefix=<prefix>        Prefix for the name of the lesson. [default: Lesson]
+    --balance-words                       Try to collect words with rare letters when the lesson contain a rare and
+                                            frequent letter (e.g 'zy' in Italian will likely pick only words with 'z')
+-h --help                                 Show this screen.
+-v --version                              Show version.
 
 Format of <charslist> file:
-  <charslist> is a file containing the new letters of each lesson. Every line is a new lesson.
-  A position for the symbols can be specified as:
-  LL: Next to the left word boundary
-  RR: Next to the right word boundary
-  LR: Next to the left or right word boundary
+<charslist> is a file containing the new letters of each lesson. Every line is a new lesson.
+A position for the symbols can be specified as:
+LL: Next to the left word boundary
+RR: Next to the right word boundary
+LR: Next to the left or right word boundary
 
 Example letters.txt:
-  jf
-  èy
-  ABCDEFGHIJKLMNOPQRSTUVWXYZ
-  LR"$
-  LL(RR)
+jf
+èy
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+LR"$
+LL(RR)
 """
 
 import itertools
@@ -70,6 +72,7 @@ RE_LEFTRIGHT_SYMBOLS = re.compile(r'LR([\W_])')
 RE_LETTERS = re.compile(r'[^\W\d_]')
 RE_DIGITS = re.compile(r'\d')
 
+
 def generateCharsCombinations(elements, maxLength):
     """Return an array of strings containing different permutations of combinations of the elements
     of different lengths up to the specified maximum length
@@ -88,7 +91,7 @@ def linspace(a, b, n):
     if n < 2:
         return b
     diff = (float(b) - a)/(n - 1)
-    return [diff * i + a  for i in range(n)]
+    return [diff*i + a for i in range(n)]
 
 
 def insertUniformly(words, items):
@@ -97,16 +100,16 @@ def insertUniformly(words, items):
     idx = linspace(0, len(words)*round(1+symbolDensity), len(items))
     for i, s in enumerate(items):
         words.insert(round(idx[i]), s)
-        
-        
+
+
 def generateNPrefixedSymbols(symbols, nSym, prefix=''):
     symb = list()
     for s in symbols:
         symString = '{0}{1}'.format(prefix, s)
         symb += [symString] * nSym
     return symb
-        
-        
+
+
 def generateSymbols(characters, nWords, symbolDensity):
     symbols = re.findall(RE_SYMBOLS, characters)
     if not symbols:
@@ -118,7 +121,7 @@ def generateSymbols(characters, nWords, symbolDensity):
 
     # Number of symbols to insert (per-symbol)
     nSym = round(nWords*symbolDensity/len(symbols))
-    
+
     symb = list()
     symb += generateNPrefixedSymbols(unmarkedSymbols, nSym)
     symb += generateNPrefixedSymbols(lSymbols, nSym, 'L')
@@ -126,19 +129,19 @@ def generateSymbols(characters, nWords, symbolDensity):
     symb += generateNPrefixedSymbols(lrSymbols, floor(nSym/2), 'L')
     symb += generateNPrefixedSymbols(lrSymbols, ceil(nSym/2), 'R')
     return symb
-        
+
 
 def addSymbols(words, characters, symbolDensity, previousCharacters='', previousSymbolsFraction=0):
     nWords = len(words)
     if not re.search(RE_SYMBOLS, previousCharacters):
         previousSymbolsFraction = 0
     symb = generateSymbols(characters, nWords, (1-previousSymbolsFraction)*symbolDensity)
-    symb += generateSymbols(previousCharacters, nWords, previousSymbolsFraction*symbolDensity)        
+    symb += generateSymbols(previousCharacters, nWords, previousSymbolsFraction*symbolDensity)
     shuffle(symb)
     words = insertUniformly(words, symb)
 
 
-def addNumbers(words, characters, numberDensity, previousCharacters, 
+def addNumbers(words, characters, numberDensity, previousCharacters,
                excludePreviousNumbers=True, max_number_length=3):
     # Add the numbers
     previousNumbers = re.findall(RE_DIGITS, previousCharacters)
@@ -149,7 +152,7 @@ def addNumbers(words, characters, numberDensity, previousCharacters,
         numbers = currentNumbers + previousNumbers
     if not numbers:
         return
-    
+
     nNum = round(len(words)*numberDensity)
     numDictionary = generateCharsCombinations(numbers, max_number_length)
     if currentNumbers:
@@ -157,8 +160,8 @@ def addNumbers(words, characters, numberDensity, previousCharacters,
         numDictionary = [x for x in numDictionary if re.search(RE_CURRENT_NUMBERS, x)]
     selectedNumbers = choices(numDictionary, k=nNum)
     insertUniformly(words, selectedNumbers)
-        
-        
+
+
 def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_lesson=2000,
                  exclude_previous_letters=False, min_word_length=4, max_word_length=100,
                  symbols_density=1, numbers_density=1, previous_symbols_fraction=0.4,
@@ -247,10 +250,11 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
                     w = w.title()
                 lCount += len(w)
                 selectedWords.append(w)
-    
+
     if selectedWords:
         addSymbols(selectedWords, currentChars, symbols_density, previousChars, previous_symbols_fraction)
-        addNumbers(selectedWords, currentChars, numbers_density, previousChars, exclude_previous_numbers, max_number_length)
+        addNumbers(selectedWords, currentChars, numbers_density, previousChars,
+                   exclude_previous_numbers, max_number_length)
         # Check that the lesson is long enough otherwise extend it by duplicating the words
         shuffle(selectedWords)
         clonedWords = list(selectedWords)
@@ -271,7 +275,7 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
     goodWordsText = goodWordsText[:characters_per_lesson]
     # Remove trailing spaces
     goodWordsText = re.sub(r'\S*$', '', goodWordsText)
-    
+
     # Wrap the text (KTouch required wrapping at 60)
     wrappedLesson = '\n'.join(textwrap.wrap(goodWordsText, word_wrap))
 
@@ -283,7 +287,7 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
         else:
             warnMsg += 'Try generating a lesson with letters before those with numbers or symbols.'
         warnings.warn(warnMsg)
-        
+
     return wrappedLesson
 
 
@@ -300,16 +304,16 @@ def lessonXMLHeader():
     return textwrap.dedent("""\
         <?xml version="1.0"?>
         <course>
-          <id>{{{id}}}</id>
-          <title>KTouch-Generator-{shortid}</title>
-          <description></description>
-          <keyboardLayout></keyboardLayout>
-          <lessons>""").format(id=uniqueid, shortid=uniqueid[:8])
+        <id>{{{id}}}</id>
+        <title>KTouch-Generator-{shortid}</title>
+        <description></description>
+        <keyboardLayout></keyboardLayout>
+        <lessons>""").format(id=uniqueid, shortid=uniqueid[:8])
 
 
 def lessonXMLFooter():
     return textwrap.dedent("""
-          </lessons>
+        </lessons>
         </course>""")
 
 
@@ -327,10 +331,10 @@ def formatLessonXML(currentChars, lessonText, lessonNumber='', lessonPrefix='Les
         prefix=lessonPrefix, number=lessonNumber, newChars=currentChars)
     lesson = """
     <lesson>
-      <id>{{{id}}}</id>
-      <title>{title}</title>
-      <newCharacters>{newChars}</newCharacters>
-      <text>{lessonText}</text>
+    <id>{{{id}}}</id>
+    <title>{title}</title>
+    <newCharacters>{newChars}</newCharacters>
+    <text>{lessonText}</text>
     </lesson>""".format(id=uuid.uuid4(), title=lessonTitle, newChars=currentChars, lessonText=lessonText)
     return lesson
 
@@ -377,7 +381,7 @@ if __name__ == '__main__':
     with open(args['<charslist>']) as f:
         lessonsChars = [line.rstrip('\n') for line in f if line]
 
-    # If we pass a line number (starting from one) create only the corresponding lesson 
+    # If we pass a line number (starting from one) create only the corresponding lesson
     # otherwise create all the lessons
     if args['--lesson-number']:
         lessonIdx = args['--lesson-number'] - 1
