@@ -1,3 +1,4 @@
+## balance-words, characters-per-lesson=1000, lesson-title-prefix=Lezione
 jf
 kd
 ls
@@ -15,4 +16,15 @@ z
 éì
 òà
 àèéìòù
-ABCDEFGHIJKLMNOPQRSTUVWXYZ
+ABCDEFGHIJKLMNOPQRSTUVWXYZ          ## max-word-length=8
+RR,RR.                              ## max-word-length=7
+RR:LR'                              ## max-word-length=7
+RR?RR!                              ## max-word-length=7
+LR"RR;                              ## max-word-length=7
+RR@-                                ## max-word-length=7
+10                                  ## max-word-length=7, previous-symbols-fraction=0
+29                                  ## max-word-length=7, previous-symbols-fraction=0
+38                                  ## max-word-length=7, previous-symbols-fraction=0
+47                                  ## max-word-length=7, previous-symbols-fraction=0
+56                                  ## max-word-length=7, previous-symbols-fraction=0
+                                    ## characters-per-lesson=2000
