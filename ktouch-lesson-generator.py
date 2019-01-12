@@ -254,11 +254,11 @@ def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_le
                 selectedWords.append(w)
 
     if selectedWords:
+        shuffle(selectedWords)
         addSymbols(selectedWords, currentChars, symbols_density, previousChars, previous_symbols_fraction)
         addNumbers(selectedWords, currentChars, numbers_density, previousChars,
                    exclude_previous_numbers, max_number_length)
         # Check that the lesson is long enough otherwise extend it by duplicating the words
-        shuffle(selectedWords)
         clonedWords = list(selectedWords)
         while len(''.join(selectedWords)) < characters_per_lesson:
             # Scramble the cloned words to make it less repetitive
