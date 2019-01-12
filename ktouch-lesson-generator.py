@@ -53,6 +53,20 @@ jf
 ABCDEFGHIJKLMNOPQRSTUVWXYZ
 LR"$
 LL(RR)
+
+It is possible to specify the command line options inside the <charslist> file as follow:
+- Add global options in the first line after ## starting at the beginning of the line
+- Add per-lesson option adding ## and the options after the lesson new characters
+
+Example characters.txt (with options):
+## characters-per-lesson=1000, balance-words
+jf
+èy
+ABCDEFGHIJKLMNOPQRSTUVWXYZ  ## balance-words=false
+LR"$
+LL(RR)
+10                          ## max-word-length=7, previous-symbols-fraction=0
+29                          ## max-word-length=7, previous-symbols-fraction=0
 """
 
 import itertools
@@ -64,7 +78,7 @@ import warnings
 from docopt import docopt
 from math import floor, ceil
 from random import shuffle, choices, sample, random
-from voluptuous import Schema, Coerce, Or, error
+from voluptuous import Schema, Coerce, Or, error, Boolean
 
 RE_POSITION_MARKERS = re.compile(r'(LL|RR|LR)')
 RE_SYMBOLS = re.compile(r'[\W_]')
@@ -73,6 +87,56 @@ RE_RIGHT_SYMBOLS = re.compile(r'RR([\W_])')
 RE_LEFTRIGHT_SYMBOLS = re.compile(r'LR([\W_])')
 RE_LETTERS = re.compile(r'[^\W\d_]')
 RE_DIGITS = re.compile(r'\d')
+
+
+def argsSchema(args):
+    """Convert the argument values from text to the correct type"""
+    schema = Schema({
+        '<charslist>':  str,  # FIXME: Use IsFile to check if file exists
+        '<dictionary>': Or(None, str),
+        '--lesson-number': Or(None, Coerce(int)),
+        '--output': Or(None, str),
+        '--word-wrap': Or(None, Coerce(int)),
+        '--characters-per-lesson': Or(None, Coerce(int)),
+        '--min-word-length': Or(None, Coerce(int)),
+        '--max-word-length': Or(None, Coerce(int)),
+        '--symbols-density': Or(None, Coerce(float)),
+        '--previous-symbols-fraction': Or(None, Coerce(float)),
+        '--numbers-density': Or(None, Coerce(float)),
+        '--max-number-length': Or(None, Coerce(int)),
+        '--max-letters-combination-length': Or(None, Coerce(int)),
+        '--lesson-title-prefix': Or(None, str),
+        str: Boolean()  # Treat all other arguments as bool
+    })
+    try:
+        args = schema(args)
+    except error.MultipleInvalid as ex:
+        print("\n".join([e.msg for e in ex.errors]))
+    return args
+
+
+def args2options(args):
+    """Parse the command line args by stripping the -- and replacing - with _"""
+    return {k.strip('--').replace('-', '_'): args[k] for k in args.keys() if '--' in k}
+
+
+def parseLessonLine(line):
+    """Return the characters of the lesson and the lesson custom options"""
+    options = dict()
+    line_tokens = line.split('##')
+    chars = line_tokens[0].strip()
+    if len(line_tokens) > 1:
+        args = line_tokens[1].split(',')
+        for arg in args:
+            temp = arg.split('=')
+            key = '--{0}'.format(temp[0].strip())
+            if len(temp) > 1:
+                value = temp[1].strip()
+            else:
+                value = True
+            options[key] = value
+    options = argsSchema(options)
+    return chars, args2options(options)
 
 
 def generateCharsCombinations(elements, maxLength):
@@ -164,14 +228,14 @@ def addNumbers(words, characters, numberDensity, previousCharacters,
     insertUniformly(words, selectedNumbers)
 
 
-def createLesson(lessonIdx, lessonsChars, words, word_wrap=60, characters_per_lesson=2000,
+def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=2000,
                  exclude_previous_letters=False, min_word_length=4, max_word_length=100,
                  symbols_density=1, numbers_density=1, previous_symbols_fraction=0.4,
                  exclude_previous_numbers=False, max_number_length=3, max_letters_combination_length=4,
                  balance_words=False, **ignored):
     """Create a KTouch lesson for the characters passed as input."""
-    currentChars = lessonsChars[lessonIdx]
-    previousChars = ''.join(lessonsChars[0:lessonIdx])
+    currentChars = parseLessonLine(lessons[lessonIdx])[0]
+    previousChars = ''.join([parseLessonLine(l)[0] for l in lessons[0:lessonIdx]])
     previousLetters = stripPositionMarkers(''.join(re.findall(RE_LETTERS, previousChars)))
     currentLetters = stripPositionMarkers(''.join(re.findall(RE_LETTERS, currentChars)))
 
@@ -344,30 +408,9 @@ def formatLessonXML(currentChars, lessonText, lessonNumber='', lessonPrefix='Les
 if __name__ == '__main__':
     # Parse docopt using schema to cast to correct type
     args = docopt(__doc__, version='1.0')
-    schema = Schema({
-        '<charslist>':  str,  # FIXME: Use IsFile to check if file exists
-        '<dictionary>': Or(None, str),
-        '--lesson-number': Or(None, Coerce(int)),
-        '--output': Or(None, str),
-        '--word-wrap': Or(None, Coerce(int)),
-        '--characters-per-lesson': Or(None, Coerce(int)),
-        '--min-word-length': Or(None, Coerce(int)),
-        '--max-word-length': Or(None, Coerce(int)),
-        '--symbols-density': Or(None, Coerce(float)),
-        '--previous-symbols-fraction': Or(None, Coerce(float)),
-        '--numbers-density': Or(None, Coerce(float)),
-        '--max-number-length': Or(None, Coerce(int)),
-        '--max-letters-combination-length': Or(None, Coerce(int)),
-        '--lesson-title-prefix': Or(None, str),
-        str: bool  # Treat all other arguments as bool
-    })
-    args = schema(args)
-    try:
-        args = schema(args)
-    except error.MultipleInvalid as ex:
-        print("\n".join([e.msg for e in ex.errors]))
+    args = argsSchema(args)
     # Create an argument list from docopt to pass it easily to createLesson
-    argoptions = {k.strip('--').replace('-', '_'): args[k] for k in args.keys() if '--' in k}
+    argoptions = args2options(args)
 
     # Acquire the dictionary file
     words = []
@@ -375,25 +418,30 @@ if __name__ == '__main__':
         with open(args['<dictionary>']) as f:
             # Consider only first column, strip newlines, strip hypnetion information from some dictionaries
             words = [re.sub('/.*$', '', line.split(' ')[0].rstrip('\n').lower()) for line in f]
-        if not args['--no-shuffle-dict']:
+        if not argoptions['no_shuffle_dict']:
             # Shuffle words to avoid picking all the variations of the same word
             shuffle(words)
 
     # Acquire the list of characters corresponding to lessons
     with open(args['<charslist>']) as f:
-        lessonsChars = [line.rstrip('\n') for line in f if line]
+        lessons = [line.rstrip('\n') for line in f if line]
+
+    if lessons[0].startswith('##'):
+        _, customOptions = parseLessonLine(lessons[0])
+        argoptions.update(customOptions)
+        del(lessons[0])
 
     # If we pass a line number (starting from one) create only the corresponding lesson
     # otherwise create all the lessons
-    if args['--lesson-number']:
-        lessonIdx = args['--lesson-number'] - 1
-        selectedChars = lessonsChars[lessonIdx]
-        outFileName = stripPositionMarkers(selectedChars)
-        selectedChars = [selectedChars]  # Make list to process with for
+    if argoptions['lesson_number']:
+        lessonIdx = argoptions['lesson_number'] - 1
+        selectedLessons = lessons[lessonIdx]
+        outFileName = stripPositionMarkers(selectedLessons)
+        selectedLessons = [selectedLessons]  # Make list to process with for
     else:
-        selectedChars = lessonsChars
-        outFileName = args['--output'].rsplit(".", 1)[0]
-    if args['--plain-text']:
+        selectedLessons = lessons
+        outFileName = argoptions['output'].rsplit(".", 1)[0]
+    if argoptions['plain_text']:
         outFileName += '.txt'
     else:
         outFileName += '.xml'
@@ -401,14 +449,17 @@ if __name__ == '__main__':
     formattedLesson = ''
     with open(outFileName, 'w') as f:
         # First lesson is for sure empty, so it won't be processed, but still we write it to file as placeholder
-        for lessonIdx, currentChars in enumerate(selectedChars):
-            wd = createLesson(lessonIdx, selectedChars, words, **argoptions)
+        for lessonIdx, currentLesson in enumerate(selectedLessons):
+            currentArgoptions = dict(argoptions)
+            currentChars, customOptions = parseLessonLine(currentLesson)
+            currentArgoptions.update(customOptions)
+            wd = createLesson(lessonIdx, selectedLessons, words, **currentArgoptions)
             # Write the lesson to file
-            if args['--plain-text']:
+            if argoptions['plain_text']:
                 formattedLesson += formatLessonPlainText(currentChars, wd)
             else:
-                formattedLesson += formatLessonXML(currentChars, wd, lessonIdx + 1, args['--lesson-title-prefix'])
-        if args['--plain-text']:
+                formattedLesson += formatLessonXML(currentChars, wd, lessonIdx + 1, argoptions['lesson_title_prefix'])
+        if argoptions['plain_text']:
             f.write(formattedLesson)
         else:
             f.write(lessonXMLHeader())

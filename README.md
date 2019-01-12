@@ -113,6 +113,47 @@ symbols. The maximum length of the words can be tuned by setting the parameter `
 python ktouch-lesson-generator.py --max-word-length=7 symbols_extended.txt dict-en_uk.txt
 ```
 
+It is possible to specify the command line options directly in the `<charslist>` file. The options
+in the first line are applied to all the lessons. It is possible to fine tune each lesson by
+specifying custom options in the lesson line.
+
+The following is an example of `<charslist>` that uses shorter word for the lessons for learning
+symbols and numbers, in order to waste less time in typing letters and focusing more on the symbols
+and numbers. The lessons of the numbers exclude the symbols.
+
+```
+## balance-words, characters-per-lesson=1000, lesson-title-prefix=Lezione
+jf
+kd
+ls
+ca
+nt
+iv
+me
+hr
+go
+bp
+qu
+wxy
+z
+èù
+éì
+òà
+àèéìòù
+ABCDEFGHIJKLMNOPQRSTUVWXYZ          ## max-word-length=8
+RR,RR.                              ## max-word-length=7
+RR:LR'                              ## max-word-length=7
+RR?RR!                              ## max-word-length=7
+LR"RR;                              ## max-word-length=7
+RR@-                                ## max-word-length=7
+10                                  ## max-word-length=7, previous-symbols-fraction=0
+29                                  ## max-word-length=7, previous-symbols-fraction=0
+38                                  ## max-word-length=7, previous-symbols-fraction=0
+47                                  ## max-word-length=7, previous-symbols-fraction=0
+56                                  ## max-word-length=7, previous-symbols-fraction=0
+                                    ## characters-per-lesson=2000
+```
+
 For a complete list of advanced options please refer to the help of the script.
 
 Notes
