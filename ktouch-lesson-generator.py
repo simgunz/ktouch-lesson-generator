@@ -29,11 +29,9 @@ Options:
                                              of words. [default: 1]
       --exclude-previous-numbers             Include only numbers from the current lesson.
       --max-number-length NUM                Maximum length of the generated numbers. [default: 3]
-      --no-shuffle-dict                      Do not shuffle the dictionary file. Useful if the dictionary file is a
-                                             frequency list and we want to prioritize picking the most common words
-                                             on the top of the list. If the dictionary is sorted alphabetically
-                                             shuffling the words allows avoiding picking all the variations of
-                                             the same word.
+      --no-shuffle-dict                      Do not shuffle the dictionary.
+      --crop-dict NUM                        Keep only the first NUM words from the dictionary. (If zero keep them
+                                             all.) [default: 0]
       --lesson-title-prefix PREFIX           Prefix for the name of the lesson. [default: Lesson]
       --balance-words                        Try to collect words with rare letters when the lesson contain a rare and
                                              frequent letter (e.g 'zy' in Italian will likely pick only words with 'z')
@@ -106,6 +104,7 @@ def argsSchema(args):
         '--max-number-length': Or(None, Coerce(int)),
         '--max-letters-combination-length': Or(None, Coerce(int)),
         '--lesson-title-prefix': Or(None, str),
+        '--crop-dict': Or(None, Coerce(int)),
         str: Boolean()  # Treat all other arguments as bool
     })
     try:
@@ -418,6 +417,8 @@ if __name__ == '__main__':
         with open(args['<dictionary>']) as f:
             # Consider only first column, strip newlines, strip hypnetion information from some dictionaries
             words = [re.sub('/.*$', '', line.split(' ')[0].rstrip('\n').lower()) for line in f]
+            if args['--crop-dict']:
+                words = words[:args['--crop-dict']]
         if not argoptions['no_shuffle_dict']:
             # Shuffle words to avoid picking all the variations of the same word
             shuffle(words)
