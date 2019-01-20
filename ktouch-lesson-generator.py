@@ -17,7 +17,7 @@ Options:
       --exclude-previous-letters             Exclude letters from the previous lessons
       --max-letters-combination-length NUM   Maximum length of the generated combinations of letter (for first 2-3
                                              lessons). [default: 4]
-      --min-word-length NUM                  Minimum length a word must have to be included in the lesson. [default: 4]
+      --min-word-length NUM                  Minimum length a word must have to be included in the lesson. [default: 1]
       --max-word-length NUM                  Maximum length a word must have to be included in the
                                              lesson. [default: 100]
       --symbols-density NUM                  Fraction of symbols that should be put in the lesson respect to the number
@@ -229,7 +229,7 @@ def addNumbers(words, characters, numberDensity, previousCharacters,
 
 
 def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=2000,
-                 exclude_previous_letters=False, min_word_length=4, max_word_length=100,
+                 exclude_previous_letters=False, min_word_length=1, max_word_length=100,
                  symbols_density=1, numbers_density=1, previous_symbols_fraction=0.4,
                  exclude_previous_numbers=False, max_number_length=3, max_letters_combination_length=4,
                  balance_words=False, **ignored):
