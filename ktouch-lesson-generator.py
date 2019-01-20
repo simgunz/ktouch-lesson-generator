@@ -273,7 +273,7 @@ def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=
             # The process stops when we select enough words to fill the lesson as specified by LETTERSPERLESSON
             # or when we exhausted the dictionary.
             if re.match(RE_MATCHED_WORD, w):
-                if len(w) > min_word_length and len(w) < max_word_length:
+                if len(w) >= min_word_length and len(w) <= max_word_length:
                     # Try to collect also words containing not frequent letters
                     # The result can still be imbalanced but at least there will be some words
                     # with the less frequent letter
