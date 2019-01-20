@@ -116,7 +116,6 @@ Europa
 Eusebio
 Eva
 FAQ
-FSF
 Fabio
 Faenza
 Fassa
@@ -436,6 +435,7 @@ Volterra
 Windows
 Zaccaria
 Zarlino
+a
 abate
 abati
 abbacinati
@@ -36186,6 +36186,8 @@ durò
 dà
 dì
 dò
+e
+è
 ebano
 ebbe
 ebbene
@@ -44871,6 +44873,7 @@ han
 hanno
 hardware
 ho
+i
 iattura
 ibrida
 ibridi
@@ -62129,6 +62132,7 @@ nuziale
 nuziali
 né
 oasi
+o
 obbedendo
 obbedente
 obbediamo
