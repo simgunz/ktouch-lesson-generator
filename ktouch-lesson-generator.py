@@ -425,7 +425,7 @@ if __name__ == '__main__':
 
     # Acquire the list of characters corresponding to lessons
     with open(args['<charslist>']) as f:
-        lessons = [line.rstrip('\n') for line in f if line]
+        lessons = [line.rstrip('\n') for line in f if line.rstrip('\n')]
 
     if lessons[0].startswith('##'):
         _, customOptions = parseLessonLine(lessons[0])
