@@ -127,7 +127,7 @@ def args2options(args):
 def charsToPrint(chars):
     """Return a string that identifies the new characters"""
     if chars == '':
-        return 'No new characters'
+        return 'All previous characters'
     else:
         return chars
 
