@@ -295,18 +295,20 @@ def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=
                     # Try to collect also words containing not frequent letters
                     # The result can still be imbalanced but at least there will be some words
                     # with the less frequent letter
-                    if balance_words:
-                        dropWord = False
+                    if balance_words and len(currentLetters) > 0:
+                        keepWord = False
                         for x in currentLetters:
                             if re.search(x, w):
-                                if lCountPerLetter[x] > characters_per_lesson/len(currentLetters):
-                                    dropWord = True
+                                if lCountPerLetter[x] < characters_per_lesson/len(currentLetters):
+                                    keepWord = True
+                                    lCountPerLetter[x] += len(w)
                                     break
-                                lCountPerLetter[x] += len(w)
-                        if dropWord:
-                            continue
-                    lCount += len(w)
-                    selectedWords.append(w)
+                    else:
+                        keepWord = True
+
+                    if keepWord:
+                        lCount += len(w)
+                        selectedWords.append(w)
                     if lCount > characters_per_lesson:
                         break
 
