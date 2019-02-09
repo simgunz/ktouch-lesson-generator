@@ -455,7 +455,8 @@ if __name__ == '__main__':
     if argoptions['lesson_number']:
         lessonIdx = argoptions['lesson_number']
         selectedLessonIdx = [lessonIdx - 1]
-        outFileName, _ = parseLessonLine(lessons[selectedLessonIdx[0]])
+        currentChars, _ = parseLessonLine(lessons[selectedLessonIdx[0]])
+        outFileName = stripPositionMarkers(currentChars)
     else:
         selectedLessonIdx = range(len(lessons))
         outFileName = argoptions['output'].rsplit(".", 1)[0]
