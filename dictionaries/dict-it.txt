@@ -184,7 +184,6 @@ Gregorio
 Guastalla
 Guglielmo
 HTML
-HURD
 Hegel
 IVA
 Iacopo
@@ -18841,8 +18840,6 @@ cavolfiore
 cavoli
 cavolo
 cavò
-cazzata
-cazzo
 cazzotti
 ce
 cecino
@@ -26528,7 +26525,6 @@ culminiate
 culminino
 culmino
 culminò
-culo
 culti
 culto
 cultore
@@ -66111,7 +66107,6 @@ pendute
 penduti
 penduto
 pendé
-pene
 penerai
 peneranno
 penerebbe
@@ -107253,8 +107248,6 @@ tetragramma
 tetre
 tetri
 tetro
-tetta
-tette
 tetti
 tetto
 tettoia
