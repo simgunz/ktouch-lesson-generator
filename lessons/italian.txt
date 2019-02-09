@@ -27,4 +27,8 @@ RR@-                                ## max-word-length=7
 38                                  ## max-word-length=7, previous-symbols-fraction=0
 47                                  ## max-word-length=7, previous-symbols-fraction=0
 56                                  ## max-word-length=7, previous-symbols-fraction=0
-                                    ## characters-per-lesson=2000
+--
+--                                  ## characters-per-lesson=2000
+
+
+
