@@ -451,12 +451,11 @@ if __name__ == '__main__':
     # If we pass a line number (starting from one) create only the corresponding lesson
     # otherwise create all the lessons
     if argoptions['lesson_number']:
-        lessonIdx = argoptions['lesson_number'] - 1
-        selectedLessons = lessons[lessonIdx]
-        outFileName = stripPositionMarkers(selectedLessons)
-        selectedLessons = [selectedLessons]  # Make list to process with for
+        lessonIdx = argoptions['lesson_number']
+        selectedLessonIdx = [lessonIdx - 1]
+        outFileName, _ = parseLessonLine(lessons[selectedLessonIdx[0]])
     else:
-        selectedLessons = lessons
+        selectedLessonIdx = range(len(lessons))
         outFileName = argoptions['output'].rsplit(".", 1)[0]
     if argoptions['plain_text']:
         outFileName += '.txt'
@@ -466,11 +465,11 @@ if __name__ == '__main__':
     formattedLesson = ''
     with open(outFileName, 'w') as f:
         # First lesson is for sure empty, so it won't be processed, but still we write it to file as placeholder
-        for lessonIdx, currentLesson in enumerate(selectedLessons):
+        for lessonIdx in selectedLessonIdx:
             currentArgoptions = dict(argoptions)
-            currentChars, customOptions = parseLessonLine(currentLesson)
+            currentChars, customOptions = parseLessonLine(lessons[lessonIdx])
             currentArgoptions.update(customOptions)
-            wd = createLesson(lessonIdx, selectedLessons, words, **currentArgoptions)
+            wd = createLesson(lessonIdx, lessons, words, **currentArgoptions)
             # Write the lesson to file
             if argoptions['plain_text']:
                 formattedLesson += formatLessonPlainText(currentChars, wd)
