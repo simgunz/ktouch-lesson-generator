@@ -119,7 +119,8 @@ specifying custom options in the lesson line.
 
 The following is an example of `<charslist>` that uses shorter word for the lessons for learning
 symbols and numbers, in order to waste less time in typing letters and focusing more on the symbols
-and numbers. The lessons of the numbers exclude the symbols.
+and numbers. The lessons of the numbers exclude the symbols. The last lesson does not include new
+characters (marked with --).
 
 ```
 ## balance-words, characters-per-lesson=1000, lesson-title-prefix=Lezione
@@ -151,7 +152,7 @@ RR@-                                ## max-word-length=7
 38                                  ## max-word-length=7, previous-symbols-fraction=0
 47                                  ## max-word-length=7, previous-symbols-fraction=0
 56                                  ## max-word-length=7, previous-symbols-fraction=0
-                                    ## characters-per-lesson=2000
+--                                  ## characters-per-lesson=2000
 ```
 
 For a complete list of advanced options please refer to the help of the script.

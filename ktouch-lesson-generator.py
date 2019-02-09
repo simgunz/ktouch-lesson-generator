@@ -56,6 +56,8 @@ It is possible to specify the command line options inside the <charslist> file a
 - Add global options in the first line after ## starting at the beginning of the line
 - Add per-lesson option adding ## and the options after the lesson new characters
 
+To create a lesson without new characters add a double dash (--) in the lesson line
+
 Example characters.txt (with options):
 ## characters-per-lesson=1000, balance-words
 jf
@@ -65,6 +67,7 @@ LR"$
 LL(RR)
 10                          ## max-word-length=7, previous-symbols-fraction=0
 29                          ## max-word-length=7, previous-symbols-fraction=0
+--                          ## characters-per-lesson=1500
 """
 
 import itertools
@@ -85,6 +88,8 @@ RE_RIGHT_SYMBOLS = re.compile(r'RR([\W_])')
 RE_LEFTRIGHT_SYMBOLS = re.compile(r'LR([\W_])')
 RE_LETTERS = re.compile(r'[^\W\d_]')
 RE_DIGITS = re.compile(r'\d')
+
+NO_NEW_CHARS = '--'
 
 
 def argsSchema(args):
@@ -119,11 +124,20 @@ def args2options(args):
     return {k.strip('--').replace('-', '_'): args[k] for k in args.keys() if '--' in k}
 
 
+def charsToPrint(chars):
+    """Return a string that identifies the new characters"""
+    if chars == '':
+        return 'No new characters'
+    else:
+        return chars
+
+
 def parseLessonLine(line):
     """Return the characters of the lesson and the lesson custom options"""
     options = dict()
     line_tokens = line.split('##')
     chars = line_tokens[0].strip()
+    chars = chars.replace(NO_NEW_CHARS, '')
     if len(line_tokens) > 1:
         args = line_tokens[1].split(',')
         for arg in args:
@@ -238,7 +252,7 @@ def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=
     previousLetters = stripPositionMarkers(''.join(re.findall(RE_LETTERS, previousChars)))
     currentLetters = stripPositionMarkers(''.join(re.findall(RE_LETTERS, currentChars)))
 
-    print('Processing: {0}'.format(stripPositionMarkers(currentChars)))
+    print('Processing: {0}'.format(stripPositionMarkers(charsToPrint(currentChars))))
 
     # Find if in the currentLetters there is at least a real letter (a non-symbol)
     # and set the regular expression for picking the correct words from the dictionary.
@@ -357,7 +371,7 @@ def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=
 
 
 def formatLessonPlainText(currentChars, lessonText):
-    lesson = 'New characters: {0}\n'.format(stripPositionMarkers(currentChars))
+    lesson = 'New characters: {0}\n'.format(stripPositionMarkers(charsToPrint(currentChars)))
     lesson += '------------------------------------------------------------\n'
     lesson += lessonText
     lesson += '\n\n'
@@ -393,7 +407,7 @@ def formatLessonXML(currentChars, lessonText, lessonNumber='', lessonPrefix='Les
     currentChars = replaceInvalidXMLCharacters(currentChars)
     currentChars = stripPositionMarkers(currentChars)
     lessonTitle = '{prefix} {number} - {newChars}'.format(
-        prefix=lessonPrefix, number=lessonNumber, newChars=currentChars)
+        prefix=lessonPrefix, number=lessonNumber, newChars=charsToPrint(currentChars))
     lesson = """
     <lesson>
     <id>{{{id}}}</id>
