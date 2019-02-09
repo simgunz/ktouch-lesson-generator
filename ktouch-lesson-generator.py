@@ -245,7 +245,7 @@ def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=
                  exclude_previous_letters=False, min_word_length=1, max_word_length=100,
                  symbols_density=1, numbers_density=1, previous_symbols_fraction=0.4,
                  exclude_previous_numbers=False, max_number_length=3, max_letters_combination_length=4,
-                 balance_words=False, **ignored):
+                 balance_words=False, no_shuffle_dict=False,  **ignored):
     """Create a KTouch lesson for the characters passed as input."""
     currentChars = parseLessonLine(lessons[lessonIdx])[0]
     previousChars = ''.join([parseLessonLine(l)[0] for l in lessons[0:lessonIdx]])
@@ -264,6 +264,11 @@ def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=
             RE_MATCHED_WORD = '[{0}{1}]*[{0}]+[{0}{1}]*$'.format(currentLetters, previousLetters)
     elif not exclude_previous_letters and previousLetters:
         RE_MATCHED_WORD = '[{0}]+$'.format(previousLetters)
+
+    if not no_shuffle_dict:
+        # Shuffle words to avoid picking all the variations of the same word
+        # and to avoid having the same words in different lessons
+        shuffle(words)
 
     selectedWords = []
     if RE_MATCHED_WORD:
@@ -433,9 +438,6 @@ if __name__ == '__main__':
             words = [re.sub('/.*$', '', line.split(' ')[0].rstrip('\n').lower()) for line in f]
             if args['--crop-dict']:
                 words = words[:args['--crop-dict']]
-        if not argoptions['no_shuffle_dict']:
-            # Shuffle words to avoid picking all the variations of the same word
-            shuffle(words)
 
     # Acquire the list of characters corresponding to lessons
     with open(args['<charslist>']) as f:
