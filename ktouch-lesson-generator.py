@@ -231,14 +231,14 @@ def addSymbols(words, characters, symbolDensity, previousCharacters='', previous
     shuffle(symb)
     words = insertUniformly(words, symb)
     # Convert the array to text
-    goodWordsText = ' '.join(words)
+    lessonText = ' '.join(words)
     # Remove loose symbols at the begin or end of the text
-    goodWordsText = re.sub(r'^[LR]{0,2}[\W_]\s*', '', goodWordsText)
-    goodWordsText = re.sub(r'[LR]{0,2}[\W_]\s*$', '', goodWordsText)
+    lessonText = re.sub(r'^[LR]{0,2}[\W_]\s*', '', lessonText)
+    lessonText = re.sub(r'[LR]{0,2}[\W_]\s*$', '', lessonText)
     # Remove the postion markers L and R and the corresponding space to position the symbol
-    goodWordsText = re.sub(r'L(\W) ', r'\1', goodWordsText)
-    goodWordsText = re.sub(r' R(\W)', r'\1', goodWordsText)
-    return goodWordsText.split()
+    lessonText = re.sub(r'L(\W) ', r'\1', lessonText)
+    lessonText = re.sub(r' R(\W)', r'\1', lessonText)
+    return lessonText.split()
 
 
 def addNumbers(words, characters, numberDensity, previousCharacters,
@@ -372,16 +372,16 @@ def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=
             selectedWords += clonedWords
 
     # Convert the array to text
-    goodWordsText = ' '.join(selectedWords)
+    lessonText = ' '.join(selectedWords)
     # Cut the lesson to the right size
-    goodWordsText = goodWordsText[:characters_per_lesson]
+    lessonText = lessonText[:characters_per_lesson]
     # Cut the last word to be sure there is a whole word at the end
-    goodWordsText = re.sub(r'\S*$', '', goodWordsText)
+    lessonText = re.sub(r'\S*$', '', lessonText)
     # Remove trailing spaces
-    goodWordsText = goodWordsText.strip()
+    lessonText = lessonText.strip()
 
     # Wrap the text (KTouch required wrapping at 60)
-    wrappedLesson = '\n'.join(textwrap.wrap(goodWordsText, word_wrap))
+    wrappedLesson = '\n'.join(textwrap.wrap(lessonText, word_wrap))
 
     # Issue warnings if the generated lesson is empty
     if not wrappedLesson:
