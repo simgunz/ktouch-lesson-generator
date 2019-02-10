@@ -176,9 +176,19 @@ def linspace(a, b, n):
 def insertUniformly(words, items):
     """Insert the items between the words in a equidistributed way"""
     symbolDensity = len(items)/len(words)
-    idx = linspace(0, len(words)*round(1+symbolDensity), len(items))
-    for i, s in enumerate(items):
-        words.insert(round(idx[i]), s)
+    everyN = round(1/symbolDensity) + 1
+    words_c = list(words)
+    items_c = list(items)
+    wordsAndItems = list()
+    nTot = len(words)+len(items)
+    i = 0
+    while items_c and words_c and i < nTot:
+        if i % everyN:
+            wordsAndItems.append(words_c.pop())
+        else:
+            wordsAndItems.append(items_c.pop())
+        i += 1
+    return wordsAndItems
 
 
 def generateNPrefixedSymbols(symbols, nSym, prefix=''):
@@ -238,7 +248,7 @@ def addNumbers(words, characters, numberDensity, previousCharacters,
         RE_CURRENT_NUMBERS = '[{0}]'.format(''.join(currentNumbers))
         numDictionary = [x for x in numDictionary if re.search(RE_CURRENT_NUMBERS, x)]
     selectedNumbers = choices(numDictionary, k=nNum)
-    insertUniformly(words, selectedNumbers)
+    return insertUniformly(words, selectedNumbers)
 
 
 def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=2000,
