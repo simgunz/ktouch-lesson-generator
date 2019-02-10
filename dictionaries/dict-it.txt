@@ -27,7 +27,6 @@ Arturo
 Asia
 Atene
 Autieri
-BIOS
 Barcellona
 Bartolomeo
 Beatrice
@@ -40,7 +39,6 @@ Brandeburgo
 Brescia
 Bretagna
 Brianza
-CD
 Caino
 California
 Camerun
@@ -82,8 +80,6 @@ Courmayeur
 Cremona
 Cristina
 Cristoforo
-DOS
-DVI
 Daniele
 Dante
 Davide
@@ -115,7 +111,6 @@ Euripide
 Europa
 Eusebio
 Eva
-FAQ
 Fabio
 Faenza
 Fassa
@@ -135,8 +130,6 @@ Fourier
 Francesca
 Francesco
 Francia
-GNU
-GPL
 Gabriele
 Gaeta
 Gaetano
@@ -183,9 +176,8 @@ Grecia
 Gregorio
 Guastalla
 Guglielmo
-HTML
 Hegel
-IVA
+Iva
 Iacopo
 Icilio
 Iddio
@@ -203,8 +195,6 @@ Jacopo
 Keplero
 Kronecker
 L'Italia
-LISP
-LaTeX
 Laplace
 Laura
 Lebesgue
@@ -266,7 +256,6 @@ Minosse
 Modena
 Monferrato
 Monza
-Morgex
 Mosè
 Murphy
 Napoli
@@ -280,7 +269,6 @@ Nizza
 Normandia
 Norvegia
 Noè
-Npc
 Olanda
 Oliver
 Orazio
@@ -289,8 +277,6 @@ Oriano
 Ostrogradski
 Ottaviano
 Ovidio
-PC
-POST
 Padova
 Palaia
 Palermo
@@ -346,7 +332,6 @@ Roma
 Romania
 Rossella
 Russia
-SGML
 Saffo
 Sahara
 Sallustio
@@ -389,7 +374,6 @@ Stefano
 Stokes
 Sulmona
 Svezia
-TBC
 Taizé
 Taranto
 Tarquinio
@@ -104945,7 +104929,6 @@ svestivo
 svesto
 svestono
 svestì
-svi
 svia
 sviai
 sviamento
