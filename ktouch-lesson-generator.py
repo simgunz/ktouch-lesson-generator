@@ -457,6 +457,8 @@ if __name__ == '__main__':
         selectedLessonIdx = [lessonIdx - 1]
         currentChars, _ = parseLessonLine(lessons[selectedLessonIdx[0]])
         outFileName = stripPositionMarkers(currentChars)
+        if not outFileName:
+            outFileName = "all_prev"
     else:
         selectedLessonIdx = range(len(lessons))
         outFileName = argoptions['output'].rsplit(".", 1)[0]
