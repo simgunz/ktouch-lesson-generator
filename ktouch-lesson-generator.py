@@ -228,6 +228,15 @@ def addSymbols(words, characters, symbolDensity, previousCharacters='', previous
     symb += generateSymbols(previousCharacters, nWords, previousSymbolsFraction*symbolDensity)
     shuffle(symb)
     words = insertUniformly(words, symb)
+    # Convert the array to text
+    goodWordsText = ' '.join(words)
+    # Remove loose symbols at the begin or end of the text
+    goodWordsText = re.sub(r'^[LR]{1,2}[\W_]\s*', '', goodWordsText)
+    goodWordsText = re.sub(r'[LR]{1,2}[\W_]\s*$', '', goodWordsText)
+    # Remove the postion markers L and R and the corresponding space to position the symbol
+    goodWordsText = re.sub(r'L(\W) ', r'\1', goodWordsText)
+    goodWordsText = re.sub(r' R(\W)', r'\1', goodWordsText)
+    return goodWordsText.split()
 
 
 def addNumbers(words, characters, numberDensity, previousCharacters,
@@ -349,9 +358,10 @@ def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=
 
     if selectedWords:
         shuffle(selectedWords)
-        addSymbols(selectedWords, currentChars, symbols_density, previousChars, previous_symbols_fraction)
-        addNumbers(selectedWords, currentChars, numbers_density, previousChars,
-                   exclude_previous_numbers, max_number_length)
+        selectedWords = addSymbols(selectedWords, currentChars, symbols_density,
+                                   previousChars, previous_symbols_fraction)
+        selectedWords = addNumbers(selectedWords, currentChars, numbers_density, previousChars,
+                                   exclude_previous_numbers, max_number_length)
         # Check that the lesson is long enough otherwise extend it by duplicating the words
         clonedWords = list(selectedWords)
         while len(''.join(selectedWords)) < characters_per_lesson:
@@ -361,16 +371,12 @@ def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=
 
     # Convert the array to text
     goodWordsText = ' '.join(selectedWords)
-    # Remove loose symbols at the begin or end of the text
-    goodWordsText = re.sub(r'^[LR][\W_]\s*', '', goodWordsText)
-    goodWordsText = re.sub(r'[LR][\W_]\s*$', '', goodWordsText)
-    # Remove the postion markers L and R and the corresponding space to position the symbol
-    goodWordsText = re.sub(r'L(\W) ', r'\1', goodWordsText)
-    goodWordsText = re.sub(r' R(\W)', r'\1', goodWordsText)
     # Cut the lesson to the right size
     goodWordsText = goodWordsText[:characters_per_lesson]
-    # Remove trailing spaces
+    # Cut the last word to be sure there is a whole word at the end
     goodWordsText = re.sub(r'\S*$', '', goodWordsText)
+    # Remove trailing spaces
+    goodWordsText = goodWordsText.strip()
 
     # Wrap the text (KTouch required wrapping at 60)
     wrappedLesson = '\n'.join(textwrap.wrap(goodWordsText, word_wrap))
