@@ -275,6 +275,9 @@ def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=
 
     print('Processing: {0}'.format(stripPositionMarkers(charsToPrint(currentChars))))
 
+    # Create a slightly longer lesson to account for dropped words by insertUniformly
+    chars_per_lesson_inflated = characters_per_lesson*1.2
+
     # Find if in the currentLetters there is at least a real letter (a non-symbol)
     # and set the regular expression for picking the correct words from the dictionary.
     RE_MATCHED_WORD = ''
@@ -320,7 +323,7 @@ def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=
                         keepWord = False
                         for x in currentLetters:
                             if re.search(x, w):
-                                if lCountPerLetter[x] < characters_per_lesson/len(currentLetters):
+                                if lCountPerLetter[x] < chars_per_lesson_inflated/len(currentLetters):
                                     keepWord = True
                                     lCountPerLetter[x] += len(w)
                                     break
@@ -330,7 +333,7 @@ def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=
                     if keepWord:
                         lCount += len(w)
                         selectedWords.append(w)
-                    if lCount > characters_per_lesson:
+                    if lCount > chars_per_lesson_inflated:
                         break
 
     # For the first 2-3 lesson the previous block fails, or it is skipped if exclude_previous_letters
@@ -346,7 +349,7 @@ def createLesson(lessonIdx, lessons, words, word_wrap=60, characters_per_lesson=
             if currentLetters:
                 RE_CURRENT_LETTERS = re.compile('[{0}]'.format(''.join(currentLetters)))
                 letterCombDict = [w for w in letterCombDict if re.search(RE_CURRENT_LETTERS, w)]
-            while lCount < characters_per_lesson:
+            while lCount < chars_per_lesson_inflated:
                 # Pick a word randonly from the generated dictionary
                 w = letterCombDict[sample(range(len(letterCombDict)), 1)[0]]
                 if any(x.isupper() for x in currentLetters):
