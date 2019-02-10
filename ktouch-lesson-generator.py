@@ -226,6 +226,8 @@ def addSymbols(words, characters, symbolDensity, previousCharacters='', previous
         previousSymbolsFraction = 0
     symb = generateSymbols(characters, nWords, (1-previousSymbolsFraction)*symbolDensity)
     symb += generateSymbols(previousCharacters, nWords, previousSymbolsFraction*symbolDensity)
+    if not symb:
+        return words
     shuffle(symb)
     words = insertUniformly(words, symb)
     # Convert the array to text
@@ -249,7 +251,7 @@ def addNumbers(words, characters, numberDensity, previousCharacters,
     else:
         numbers = currentNumbers + previousNumbers
     if not numbers:
-        return
+        return words
 
     nNum = round(len(words)*numberDensity)
     numDictionary = generateCharsCombinations(numbers, max_number_length)
