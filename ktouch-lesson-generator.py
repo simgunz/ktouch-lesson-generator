@@ -233,8 +233,8 @@ def addSymbols(words, characters, symbolDensity, previousCharacters='', previous
     # Convert the array to text
     goodWordsText = ' '.join(words)
     # Remove loose symbols at the begin or end of the text
-    goodWordsText = re.sub(r'^[LR]{1,2}[\W_]\s*', '', goodWordsText)
-    goodWordsText = re.sub(r'[LR]{1,2}[\W_]\s*$', '', goodWordsText)
+    goodWordsText = re.sub(r'^[LR]{0,2}[\W_]\s*', '', goodWordsText)
+    goodWordsText = re.sub(r'[LR]{0,2}[\W_]\s*$', '', goodWordsText)
     # Remove the postion markers L and R and the corresponding space to position the symbol
     goodWordsText = re.sub(r'L(\W) ', r'\1', goodWordsText)
     goodWordsText = re.sub(r' R(\W)', r'\1', goodWordsText)
