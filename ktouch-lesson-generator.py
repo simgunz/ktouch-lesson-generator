@@ -76,9 +76,9 @@ import textwrap
 import uuid
 import warnings
 
-from docopt import docopt
 from math import floor, ceil
 from random import shuffle, choices, sample, random
+from docopt import docopt
 from voluptuous import Schema, Coerce, Or, error, Boolean
 
 RE_POSITION_MARKERS = re.compile(r'(LL|RR|LR)')
