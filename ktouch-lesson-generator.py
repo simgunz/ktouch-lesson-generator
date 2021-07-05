@@ -14,7 +14,10 @@ Options:
   -p, --plain-text                           Output the lessons in plain text instead of XML
   -w NUM, --word-wrap NUM                    Wrap lesson text at this length. [default: 60]
   -l NUM, --characters-per-lesson NUM        Number of characters in a lesson. [default: 2000]
+      --course-description STR               Sets the description for the course (default: "")
+      --course-title STR                     Sets the title for the course [default: KTouch-Generator-{shortid}]
       --exclude-previous-letters             Exclude letters from the previous lessons
+      --keyboard-layout STR                  Sets the keyboard-layout (default: "")
       --max-letters-combination-length NUM   Maximum length of the generated combinations of letter (for first 2-3
                                              lessons). [default: 4]
       --min-word-length NUM                  Minimum length a word must have to be included in the lesson. [default: 1]
@@ -110,6 +113,9 @@ def argsSchema(args):
         '--max-letters-combination-length': Or(None, Coerce(int)),
         '--lesson-title-prefix': Or(None, str),
         '--crop-dict': Or(None, Coerce(int)),
+        '--keyboard-layout': Or(None, str),
+        '--course-description': Or(None, str),
+        '--course-title': Or(None, str),
         str: Boolean()  # Treat all other arguments as bool
     })
     try:
@@ -406,16 +412,27 @@ def formatLessonPlainText(currentChars, lessonText):
     return lesson
 
 
-def lessonXMLHeader():
+def lessonXMLHeader(keyboard_layout=None, description=None, title=None):
     uniqueid = str(uuid.uuid4())
+    if title is None:
+        title = "KTouch-Generator-{shortid}"
+    title = title.format(shortid=uniqueid[:8])
+    if description is None:
+        description = ""
+    if keyboard_layout is None:
+        keyboard_layout = ""
     return textwrap.dedent("""\
         <?xml version="1.0"?>
         <course>
         <id>{{{id}}}</id>
-        <title>KTouch-Generator-{shortid}</title>
-        <description></description>
-        <keyboardLayout></keyboardLayout>
-        <lessons>""").format(id=uniqueid, shortid=uniqueid[:8])
+        <title>{title}</title>
+        <description>{description}</description>
+        <keyboardLayout>{keyboard_layout}</keyboardLayout>
+        <lessons>""").format(
+            id=uniqueid,
+            title=title,
+            description=description,
+            keyboard_layout=keyboard_layout)
 
 
 def lessonXMLFooter():
@@ -504,7 +521,10 @@ def cli():
         if argoptions['plain_text']:
             f.write(formattedLesson)
         else:
-            f.write(lessonXMLHeader())
+            f.write(lessonXMLHeader(
+                argoptions["keyboard_layout"],
+                argoptions["course_description"],
+                argoptions["course_title"]))
             f.write(formattedLesson)
             f.write(lessonXMLFooter())
 
