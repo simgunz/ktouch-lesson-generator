@@ -2,6 +2,7 @@ Ktouch lesson generator is a script for automatically generating custom lessons 
 
 Basic usage
 -----------
+
 The lessons to be generated are specified in the text file `<charslist>` by writing in each line the new characters
 to be learned in each lesson.
 
@@ -18,8 +19,9 @@ an existing course.
 
 The following file generates a full course to learn all the letters in the Italian alphabeth, the extra five English letters, the Italian accented letters, and the capital case version of all the letters.
 
-```
 italian.txt:
+
+```
 jf
 kd
 ls
@@ -42,6 +44,7 @@ ABCDEFGHIJKLMNOPQRSTUVWXYZ
 
 To generate the lessons with random permutations  of the letters run the following command
 (the lessons will be written to the file `ktouch-lessons.xml`)
+
 ```
 python ktouch-lesson-generator.py italian.txt
 ```
@@ -49,23 +52,27 @@ python ktouch-lesson-generator.py italian.txt
 If a dictionary file (containining one word per line) is specified, the script generates the lessons
 using meaningful words. The first few lessons are still generated with random permutations of letters
 given that there are not enough letters to pick meaningful words.
+
 ```
 python ktouch-lesson-generator.py italian.txt dict-it.txt
 ```
 
 Optionally we can generate a single lesson by specifying the corresponding line number in the `<charslist>` file.
 This will generate a file named with the characters of the selected lesson, in this case `nt.txt`
+
 ```
 python ktouch-lesson-generator.py -n 5 italian.txt dict-it.txt
 ```
 
 If the generated lessons are too long, we can tune the length of each lesson as follows
+
 ```
 python ktouch-lesson-generator.py --characters-per-lesson=1000 italian.txt dict-it.txt
 ```
 
 Advanced usage
 --------------
+
 The script can also used to generate lessons to learn symbols instead of letters. Given that some symbols
 usually go in a certain position respect to a word, we can specify the following specifiers in the lesson file:
 
@@ -109,6 +116,7 @@ _|
 When we generate lessons to learn symbols, it is useful to have normal words in the middle of the text to make the
 typing more natural, but we may want to limit the length of the words to not waste time in typing letters instead of
 symbols. The maximum length of the words can be tuned by setting the parameter `--max-word-length=n`.
+
 ```
 python ktouch-lesson-generator.py --max-word-length=7 symbols_extended.txt dict-en_uk.txt
 ```
@@ -159,6 +167,7 @@ For a complete list of advanced options please refer to the help of the script.
 
 Notes
 -----
+
 - The auto-generated lessons favour longer combination of letters
 - The learning order of the new letters is important and different combinations need to be tried manually to optimize
 the result. E.g. in Italian the letter ‘q’ is always followed by the letter ‘u’, so if we try
@@ -169,4 +178,5 @@ together. It is possible to mitigate this problem specifying the flag `--balance
 
 License MIT
 -----------
-Project License can be found [here](https://github.com/simgunz/ktouch-lesson-generator/blob/master/LICENSE.md).
+
+Project License can be found in [LICENSE.md](https://github.com/simgunz/ktouch-lesson-generator/blob/master/LICENSE.md).
