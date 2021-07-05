@@ -446,7 +446,7 @@ def formatLessonXML(currentChars, lessonText, lessonNumber='', lessonPrefix='Les
     return lesson
 
 
-if __name__ == '__main__':
+def cli():
     # Parse docopt using schema to cast to correct type
     args = docopt(__doc__, version='1.0')
     args = argsSchema(args)
@@ -507,3 +507,7 @@ if __name__ == '__main__':
             f.write(lessonXMLHeader())
             f.write(formattedLesson)
             f.write(lessonXMLFooter())
+
+
+if __name__ == '__main__':
+    cli()
