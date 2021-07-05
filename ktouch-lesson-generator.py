@@ -457,7 +457,7 @@ def cli():
     words = []
     if args['<dictionary>']:
         with open(args['<dictionary>']) as f:
-            # Consider only first column, strip newlines, strip hypnetion information from some dictionaries
+            # Consider only first column, strip newlines, strip hyphenation information from some dictionaries
             words = [re.sub('/.*$', '', line.split(' ')[0].rstrip('\n').lower()) for line in f]
             if args['--crop-dict']:
                 words = words[:args['--crop-dict']]
